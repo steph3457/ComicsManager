@@ -1,0 +1,15 @@
+<div>
+  <ul>
+    <li *ngFor="let image of images; let i = index">
+      <div class="image" [hidden]="!libraryService.isCurrentPage(i)">
+        <img [src]="libraryService.getImageUrl(image)" class="img-responsive">
+      </div>
+    </li>
+  </ul>
+</div>
+<div class="previousPage" (click)="libraryService.previousPage()">
+</div>
+<div class="nextPage" (click)="libraryService.nextPage()">
+</div>
+<div class="back" (click)="libraryService.backToComic()">
+</div>

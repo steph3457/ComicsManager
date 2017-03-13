@@ -1,0 +1,16 @@
+{
+  "publishers": {
+    "Marvel": {
+      "api_detail_url": "http://comicvine.gamespot.com/api/publisher/4010-31/",
+      "id": 31,
+      "name": "Marvel"
+    },
+    "DC Comics": {
+      "api_detail_url": "http://comicvine.gamespot.com/api/publisher/4010-10/",
+      "id": 10,
+      "name": "DC Comics"
+    }
+  },
+  "comicsPath": "/Path/To/Your/Comics",
+  "comicVineAPI": "YourComicVineAPIKey"
+}

@@ -1,0 +1,7 @@
+<div>
+  <h1>Config</h1>
+  <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"><br>
+  <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"><br>
+  
+  <button (click)="libraryService.saveConfig()">Save config</button>
+</div>

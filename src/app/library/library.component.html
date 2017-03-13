@@ -1,0 +1,27 @@
+<div>
+  <h1>{{comics.length}} series</h1>
+  <h3>{{libraryService.count_of_possessed_issues}} possessed issues</h3>
+  <h3>{{libraryService.count_of_read_issues}} read issues</h3>
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+      <thead>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Year</th>
+        <th>Publisher</th>
+        <th>#Issues</th>
+        <th>#Possessed Issues</th>
+        <th>#Read Issues</th>
+      </thead>
+      <tr *ngFor="let comic of comics" class="clickable" (click)="libraryService.displayComic(comic)">
+        <td><img *ngIf="comic.image" src="{{comic.image}}" class="img-responsive"></td>
+        <td>{{comic.title}}</td>
+        <td>{{comic.year}}</td>
+        <td>{{comic.publisher?.name}}</td>
+        <td>{{comic.count_of_issues}}</td>
+        <td [class]="comic.getPossessedClass()">{{comic.count_of_possessed_issues}}</td>
+        <td [class]="comic.getReadClass()">{{comic.count_of_read_issues}}</td>
+      </tr>
+    </table>
+  </div>
+</div>
