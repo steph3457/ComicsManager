@@ -2,10 +2,13 @@
 
 ## Dependencies
 You need the `unrar` command to read your comics archived in rar file.
+`npm install -g @angular/cli`
+`npm install -g typescript`
 
 ## Install
 `clone git https://github.com/steph3457/ComicsManager.git`
 `cd ComicsManager` 
+`mkdir temp`
 `npm install`
 
 ## Build
