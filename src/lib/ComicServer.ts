@@ -10,6 +10,9 @@ export class ComicServer extends Comic {
   issues: { [name: string]: IssueServer } = {};
   constructor(comic: ComicServer) {
     super(comic);
+    for (var issue in comic.issues) {
+      this.issues[issue] = new IssueServer(comic.issues[issue]);
+    }
   }
 
   update(comicVineJson) {

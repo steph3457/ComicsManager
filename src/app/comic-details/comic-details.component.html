@@ -1,6 +1,6 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <div id="title" [hidden]="edit">
+    <div id="title">
       <h2 (click)="editMode()">{{libraryService.comic.title}} - {{libraryService.comic.publisher?.name}} ({{libraryService.comic.year}})</h2>
       <div [hidden]="edit">{{libraryService.comic.comicVineId}}</div>
       <div [hidden]="!edit"><input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="libraryService.comic.comicVineId"></div>
@@ -17,10 +17,10 @@
     <table class="table table-striped table-hover">
       <thead>
         <th>Image</th>
-        <th>#Issue</th>
+        <th (click)="libraryService.comic.sortBy('number')">#Issue</th>
         <th>File name</th>
-        <th>Title</th>
-        <th>Date</th>
+        <th (click)="libraryService.comic.sortBy('title')">Title</th>
+        <th (click)="libraryService.comic.sortBy('date')">Date</th>
         <th>Read</th>
       </thead>
       <tr *ngFor="let issue of libraryService.comic.getIssues()" [class]="issue.getClass()">
@@ -28,7 +28,7 @@
         <td>{{issue.number}}</td>
         <td class="clickable" (click)="libraryService.read(issue)">{{issue.file_name}}</td>
         <td>{{issue.title}}</td>
-        <td>{{issue.date}}</td>
+        <td>{{issue.date |date:'longDate'}}</td>
         <td class="clickable" (click)="libraryService.markRead(issue)">
           {{issue.readingStatus.currentPage}}/{{issue.readingStatus.pageCount}}
         </td>

@@ -1,7 +1,7 @@
 import { Publisher } from "./Publisher";
 export class Config {
-    comicsPath: string;
-    comicVineAPI: string;
+    comicsPath: string="";
+    comicVineAPI: string="";
     publishers: { [name: string]: Publisher } = {};
     constructor(config: Config) {
         if (config) {

@@ -18,9 +18,7 @@ export class LibraryService {
   loading: boolean = false;
   config: Config;
   comicsComparer: (c1: Comic, c2: Comic) => number = Comic.ComicTitleComparer;
-  issuesComparer: (i1: Issue, i2: Issue) => number = Issue.IssueNumberComparer;
   comicsReverse: boolean = false;
-  issuesReverse: boolean = true;
 
   constructor(private http: Http, private router: Router) {
     this.http.get('/getLibrary').subscribe(res => {

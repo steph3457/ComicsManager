@@ -2,20 +2,22 @@ import { Issue } from "./Issue";
 import { Publisher } from "./Publisher";
 
 export class Comic {
-  folder_name: string;
-  title: string;
-  year: string;
-  image: string;
+  folder_name: string = "";
+  title: string = "";
+  year: string = "";
+  image: string = "";
   comicVineId: number;
-  count_of_issues: number;
-  count_of_possessed_issues: number;
-  count_of_read_issues: number;
-  description: string;
-  api_detail_url: string;
-  site_detail_url: string;
+  count_of_issues: number = 0;
+  count_of_possessed_issues: number = 0;
+  count_of_read_issues: number = 0;
+  description: string = "";
+  api_detail_url: string = "";
+  site_detail_url: string = "";
   publisher: Publisher;
   issues: { [name: string]: Issue } = {};
   finished: boolean = false;
+  issuesComparer: (i1: Issue, i2: Issue) => number = Issue.IssueNumberComparer;
+  issuesReverse: boolean = true;
   constructor(comic: Comic) {
     if (comic) {
       this.folder_name = comic.folder_name;
@@ -77,7 +79,36 @@ export class Comic {
     for (var i in this.issues) {
       issues.push(this.issues[i]);
     }
-    return issues.sort(Issue.IssueNumberComparer).reverse();
+    issues = issues.sort(this.issuesComparer);
+    if (this.issuesReverse) {
+      issues = issues.reverse();
+    }
+    return issues;
+  }
+  sortBy(column: string) {
+    switch (column) {
+      case "title": {
+        if (this.issuesComparer === Issue.IssueTitleComparer)
+          this.issuesReverse = !this.issuesReverse;
+        this.issuesComparer = Issue.IssueTitleComparer;
+        break;
+      }
+      case "date": {
+        if (this.issuesComparer === Issue.IssueDateComparer)
+          this.issuesReverse = !this.issuesReverse;
+        this.issuesComparer = Issue.IssueDateComparer;
+        break;
+      }
+      case "number": {
+        if (this.issuesComparer === Issue.IssueNumberComparer)
+          this.issuesReverse = !this.issuesReverse;
+        this.issuesComparer = Issue.IssueNumberComparer;
+        break;
+      }
+      default:
+        break;
+
+    }
   }
 
   updateCount() {
