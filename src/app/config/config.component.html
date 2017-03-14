@@ -3,9 +3,11 @@
     <h1>Config</h1>
   </div>
   <div class="panel-body">
-    <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"><br>
-    <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"><br>
-
+    <div>Comics path: <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"></div>    
+    <div>ComicVine API key: <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"></div>
+    <div *ngFor="let publisher of libraryService.config.getPublishers()">
+      {{publisher.name}}
+    </div>
     <button (click)="libraryService.saveConfig()">Save config</button>
   </div>
 </div>
