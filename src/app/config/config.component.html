@@ -1,7 +1,28 @@
-<div>
-  <h1>Config</h1>
-  <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"><br>
-  <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"><br>
-  
-  <button (click)="libraryService.saveConfig()">Save config</button>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h1>Config</h1>
+  </div>
+  <div class="panel-body">
+    <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"><br>
+    <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"><br>
+
+    <button (click)="libraryService.saveConfig()">Save config</button>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h1>Special commands</h1>
+  </div>
+  <div class="panel-body">
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a (click)="libraryService.parseComics()">Update comics</a></li>
+        <li><a (click)="libraryService.parseIssues()">Update issues</a></li>
+        <li><a (click)="libraryService.findExactMapping()">Update comics info with Comic Vine API</a></li>
+        <li><a (click)="libraryService.updateComicsInfos()">Update issues info with Comic Vine API</a></li>
+        <li><a (click)="libraryService.saveLibrary()">Save library</a></li>
+      </ul>
+    </div>
+  </div>
 </div>

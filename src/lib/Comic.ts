@@ -10,28 +10,30 @@ export class Comic {
   count_of_issues: number;
   count_of_possessed_issues: number;
   count_of_read_issues: number;
-  description:string;
+  description: string;
   api_detail_url: string;
   site_detail_url: string;
   publisher: Publisher;
-  issues: Issue[] = [];
+  issues: { [name: string]: Issue } = {};
   finished: boolean = false;
   constructor(comic: Comic) {
-    this.folder_name = comic.folder_name;
-    this.title = comic.title;
-    this.year = comic.year;
-    this.image = comic.image;
-    this.comicVineId = comic.comicVineId;
-    this.count_of_issues = comic.count_of_issues;
-    this.count_of_possessed_issues = comic.count_of_possessed_issues;
-    this.count_of_read_issues = comic.count_of_read_issues;
-    this.description = comic.description;
-    this.api_detail_url = comic.api_detail_url;
-    this.site_detail_url = comic.site_detail_url;
-    this.publisher = comic.publisher;
-    this.finished = comic.finished;
-    for (var issue in comic.issues) {
-      this.issues.push(new Issue(comic.issues[issue]));
+    if (comic) {
+      this.folder_name = comic.folder_name;
+      this.title = comic.title;
+      this.year = comic.year;
+      this.image = comic.image;
+      this.comicVineId = comic.comicVineId;
+      this.count_of_issues = comic.count_of_issues;
+      this.count_of_possessed_issues = comic.count_of_possessed_issues;
+      this.count_of_read_issues = comic.count_of_possessed_issues;
+      this.description = comic.description;
+      this.api_detail_url = comic.api_detail_url;
+      this.site_detail_url = comic.site_detail_url;
+      this.publisher = new Publisher(comic.publisher);
+      this.finished = comic.finished;
+      for (var issue in comic.issues) {
+        this.issues[issue] = new Issue(comic.issues[issue]);
+      }
     }
   }
   update(comic: Comic) {
@@ -43,7 +45,7 @@ export class Comic {
     this.count_of_issues = comic.count_of_issues;
     this.count_of_possessed_issues = comic.count_of_possessed_issues;
     this.count_of_read_issues = comic.count_of_read_issues;
-    this.description= comic.description;
+    this.description = comic.description;
     this.api_detail_url = comic.api_detail_url;
     this.site_detail_url = comic.site_detail_url;
     this.publisher = comic.publisher;
@@ -69,5 +71,29 @@ export class Comic {
       return "warning";
     }
     return "info";
+  }
+  getIssues(): Issue[] {
+    var issues: Issue[] = [];
+    for (var i in this.issues) {
+      issues.push(this.issues[i]);
+    }
+    return issues.sort(Issue.IssueNumberComparer).reverse();
+  }
+
+  updateCount() {
+    var possessed = 0;
+    var read = 0;
+    for (var issue in this.issues) {
+      if (!this.issues[issue].annual) {
+        if (this.issues[issue].readingStatus.read) {
+          read++;
+        }
+        if (this.issues[issue].possessed) {
+          possessed++;
+        }
+      }
+    }
+    this.count_of_possessed_issues = possessed;
+    this.count_of_read_issues = read;
   }
 }

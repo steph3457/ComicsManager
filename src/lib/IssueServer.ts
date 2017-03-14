@@ -1,60 +1,15 @@
+import { Issue } from "./Issue";
 import { Config } from "./Config";
 import path = require('path');
 import Unrar = require('node-unrar');
 import { ReadingStatus } from "./ReadingStatus";
 
-export class Issue {
-  folder_name: string;
-  file_name: string;
-  title: string;
-  year: string;
-  image: string;
-  comicVineId: number;
-  number: string;
-  readingStatus: ReadingStatus;
-  possessed: boolean;
-  api_detail_url: string;
-  site_detail_url: string;
-  comicId: number;
-  annual: boolean;
-  date: Date;
-  //description:string;
-  constructor(issue: Issue) {
-    if (issue) {
-      this.folder_name = issue.folder_name;
-      this.file_name = issue.file_name;
-      this.title = issue.title;
-      this.year = issue.year;
-      this.image = issue.image;
-      this.comicVineId = issue.comicVineId;
-      this.number = issue.number;
-      this.possessed = issue.possessed;
-      this.api_detail_url = issue.api_detail_url;
-      this.site_detail_url = issue.site_detail_url;
-      this.annual = issue.annual;
-      this.readingStatus = new ReadingStatus(issue.readingStatus);
-      this.date = issue.date;
-      //this.description= issue.description;
-    }
-    else {
-      this.folder_name = "";
-      this.file_name = "";
-      this.title = "";
-      this.year = "";
-      this.image = "";
-      this.comicVineId = null;
-      this.number = null;
-      this.possessed = false;
-      this.api_detail_url = "";
-      this.site_detail_url = "";
-      this.annual = false;
-      this.readingStatus = new ReadingStatus(null);
-      this.date= null;
-      //this.description="";
-    }
+export class IssueServer extends Issue {
+  constructor(issue: IssueServer) {
+    super(issue);
   }
 
-  update(comicVineJson) {
+  updateFromComicVine(comicVineJson) {
     this.title = comicVineJson.name;
     this.api_detail_url = comicVineJson.api_detail_url;
     this.site_detail_url = comicVineJson.site_detail_url;
@@ -112,8 +67,7 @@ export class Issue {
       this.readingStatus.read = true;
       this.readingStatus.currentPage = this.readingStatus.pageCount;
     }
-    else
-    {
+    else {
       this.readingStatus.read = false;
       this.readingStatus.currentPage = 0;
     }

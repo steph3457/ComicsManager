@@ -1,28 +1,28 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
-import { Comic } from "./Comic";
-import { Issue } from "./Issue";
-import { Config } from "../Config";
+import { Comic } from "../lib/Comic";
+import { Issue } from "../lib/Issue";
+import { Config } from "../lib/Config";
 
 @Injectable()
 export class LibraryService {
 
   title: string = 'Comics Library';
-  comics: Comic[] = [];
+  comics: { [name: string]: Comic; } = {};
   comic: Comic;
   issue: Issue;
   images: string[];
   count_of_possessed_issues: number = 0;
   count_of_read_issues: number = 0;
   loading: boolean = false;
-  config :Config;
+  config: Config;
 
   constructor(private http: Http, private router: Router) {
     this.http.get('/getLibrary').subscribe(res => {
       var jsonRes = res.json();
-      for (var obj in jsonRes) {
-        this.comics.push(new Comic(jsonRes[obj]));
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
     });
@@ -34,41 +34,43 @@ export class LibraryService {
   updateCount() {
     this.count_of_possessed_issues = 0;
     this.count_of_read_issues = 0;
-    for (var i in this.comics) {
-      this.count_of_possessed_issues += this.comics[i].count_of_possessed_issues;
-      this.count_of_read_issues += this.comics[i].count_of_read_issues;
+    for (var c in this.comics) {
+      
+      var comic = this.comics[c];
+      comic.updateCount();
+      this.count_of_possessed_issues += comic.count_of_possessed_issues;
+      this.count_of_read_issues += comic.count_of_read_issues;
     }
   }
   parseComics() {
-    this.http.get('/parseComics')
-      .subscribe(res => {
-        var jsonRes = res.json();
-        this.comics = [];
-        for (var obj in jsonRes) {
-          this.comics.push(new Comic(jsonRes[obj]));
-        }
-        this.updateCount();
-      });
+    this.http.get('/parseComics').subscribe(res => {
+      var jsonRes = res.json();
+      this.comics = {};
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
+      }
+      this.updateCount();
+    });
   }
   parseIssues() {
     this.http.get('/parseIssues').subscribe(res => {
-        var jsonRes = res.json();
-        this.comics = [];
-        for (var obj in jsonRes) {
-          this.comics.push(new Comic(jsonRes[obj]));
-        }
-        this.updateCount();
-      });
+      var jsonRes = res.json();
+      this.comics = {};
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
+      }
+      this.updateCount();
+    });
   }
   saveLibrary() {
     this.http.get('/saveLibrary').subscribe(res => {
-        var jsonRes = res.json();
-        this.comics = [];
-        for (var obj in jsonRes) {
-          this.comics.push(new Comic(jsonRes[obj]));
-        }
-        this.updateCount();
-      });
+      var jsonRes = res.json();
+      this.comics = {};
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
+      }
+      this.updateCount();
+    });
   }
   saveConfig() {
     this.http.post('/saveConfig', this.config).subscribe(res => {
@@ -99,14 +101,26 @@ export class LibraryService {
       this.updateCount();
     });
   }
+  findExactMapping() {
+    this.http.get('/findExactMapping').subscribe(res => {
+      this.comic.update(res.json());
+      this.updateCount();
+    });
+  }
+  updateComicsInfos() {
+    this.http.get('/updateLibraryInfos').subscribe(res => {
+      this.comic.update(res.json());
+      this.updateCount();
+    });
+  }
   updateComicInfos() {
     this.http.get('/updateLibraryInfos/' + encodeURI(this.comic.folder_name)).subscribe(res => {
       this.comic.update(res.json());
       this.updateCount();
     });
   }
-  updateComicVineId(comicVineId: number) {
-    this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + comicVineId).subscribe(res => {
+  updateComicVineId() {
+    this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
       this.comic.update(res.json());
       this.updateCount();
     });
@@ -161,5 +175,12 @@ export class LibraryService {
   }
   getPossessedCount(comic: Comic): number {
     return comic.count_of_possessed_issues;
+  }
+  getComics(): Comic[] {
+    var comics: Comic[] = [];
+    for (var i in this.comics) {
+      comics.push(this.comics[i]);
+    }
+    return comics;
   }
 }

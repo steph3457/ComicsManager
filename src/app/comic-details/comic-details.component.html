@@ -1,15 +1,15 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <div id="title" [hidden]="edit">
-      <h2 (click)="editMode()">{{comic.title}}</h2>{{comic.comicVineId}}
+      <h2 (click)="editMode()">{{libraryService.comic.title}}</h2>{{libraryService.comic.comicVineId}}
     </div>
     <div id="input" [hidden]="!edit">
-      <h2 (click)="editMode()">{{comic.title}}</h2><input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="comic.comicVineId">
+      <h2 (click)="editMode()">{{libraryService.comic.title}}</h2><input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="libraryService.comic.comicVineId">
     </div>
   </div>
   <div class="panel-body">
-    <img *ngIf="comic.image" [src]="comic.image" class="description img-responsive">
-    <p [innerHTML]="comic.description"></p>
+    <img *ngIf="libraryService.comic.image" [src]="libraryService.comic.image" class="description img-responsive">
+    <p [innerHTML]="libraryService.comic.description"></p>
   </div>
 </div>
 
@@ -24,7 +24,7 @@
         <th>Date</th>
         <th>Read</th>
       </thead>
-      <tr *ngFor="let issue of comic.issues" [class]="issue.getClass()">
+      <tr *ngFor="let issue of libraryService.comic.getIssues()" [class]="issue.getClass()">
         <td><img *ngIf="issue.image" src="{{issue.image}}" class="img-responsive"></td>
         <td>{{issue.number}}</td>
         <td class="clickable" (click)="libraryService.read(issue)">{{issue.file_name}}</td>

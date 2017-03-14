@@ -1,20 +1,20 @@
 import path = require('path');
-import { Comic } from "./Comic";
-import { Issue } from "./Issue";
+import { ComicServer } from "./ComicServer";
+import { IssueServer } from "./IssueServer";
 import { Config } from "./Config";
 
 export class ComicsLibrary {
     private jsonfile = require('jsonfile');
     private comicsLibraryFileName = "comicsLibrary.json";
     private configFileName = "config.json";
-    comics: { [name: string]: Comic; } = {};
+    comics: { [name: string]: ComicServer; } = {};
     config: Config;
     constructor() {
         var comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
         var config = this.jsonfile.readFileSync(this.configFileName, { throws: false });
         this.config = new Config(config);
         for (var comic in comicsLibrary) {
-            this.comics[comic] = new Comic(comicsLibrary[comic]);
+            this.comics[comic] = new ComicServer(comicsLibrary[comic]);
         }
     }
     saveLibrary() {
@@ -45,7 +45,7 @@ export class ComicsLibrary {
         if (this.comics[folderName]) {
             return;
         }
-        var comic: Comic = new Comic(null);
+        var comic: ComicServer = new ComicServer(null);
         comic.folder_name = folderName;
         var folderNameSplitted = folderName.match(/(.*)_\(([0-9]*)\)$/)
         if (folderNameSplitted && folderNameSplitted.length === 3) {
@@ -80,7 +80,7 @@ export class ComicsLibrary {
             this.comics[req.comic].read(req.issue, this.config, res);
         }
     }
-    markRead(issue: Issue) {
+    markRead(issue: IssueServer) {
         if (issue.folder_name && this.comics[issue.folder_name]) {
             if (issue.file_name) {
                 this.comics[issue.folder_name].markIssueRead(issue.file_name);
@@ -91,7 +91,7 @@ export class ComicsLibrary {
         }
         this.saveLibrary();
     }
-    updateReadingStatus(issue: Issue) {
+    updateReadingStatus(issue: IssueServer) {
         if (issue.folder_name && this.comics[issue.folder_name]) {
             this.comics[issue.folder_name].updateReadingStatus(issue);
         }

@@ -1,48 +1,21 @@
+import { Comic } from "./Comic";
 import request = require('request');
 import { Config } from "./Config";
-import { Issue } from "./Issue";
+import { IssueServer } from "./IssueServer";
 import { Publisher } from "./Publisher";
 import path = require('path');
 
-export class Comic {
-  folder_name: string;
-  title: string;
-  year: string;
-  image: string;
-  comicVineId: number;
-  count_of_issues: number;
-  count_of_possessed_issues: number;
-  count_of_read_issues: number;
-  description: string;
-  api_detail_url: string;
-  site_detail_url: string;
-  publisher: Publisher;
-  issues: { [name: string]: Issue } = {};
-  finished: boolean = false;
-  constructor(comic: Comic) {
-    if (comic) {
-      this.folder_name = comic.folder_name;
-      this.title = comic.title;
-      this.year = comic.year;
-      this.image = comic.image;
-      this.comicVineId = comic.comicVineId;
-      this.count_of_issues = comic.count_of_issues;
-      this.count_of_possessed_issues = comic.count_of_possessed_issues;
-      this.count_of_read_issues = comic.count_of_possessed_issues;
-      this.description = comic.description;
-      this.api_detail_url = comic.api_detail_url;
-      this.site_detail_url = comic.site_detail_url;
-      this.publisher = new Publisher(comic.publisher);
-      this.finished = comic.finished;
-      for (var issue in comic.issues) {
-        this.issues[issue] = new Issue(comic.issues[issue]);
-      }
-    }
+export class ComicServer extends Comic {
+
+  issues: { [name: string]: IssueServer } = {};
+  constructor(comic: ComicServer) {
+    super(comic);
   }
 
   update(comicVineJson) {
-    this.count_of_issues = comicVineJson.count_of_issues;
-    this.image = comicVineJson.image.thumb_url;
+    this.count_of_issues = comicVineJson.issues ? comicVineJson.issues.length : comicVineJson.count_of_issues;
+    if (comicVineJson.image)
+      this.image = comicVineJson.image.thumb_url;
     this.api_detail_url = comicVineJson.api_detail_url;
     this.site_detail_url = comicVineJson.site_detail_url;
     this.publisher = new Publisher(comicVineJson.publisher);
@@ -54,18 +27,18 @@ export class Comic {
   updateIssueInformation(comicVineJson) {
     var issueNumber: number = parseFloat(comicVineJson.issue_number);
     var found = false;
-    var issue: Issue;
+    var issue: IssueServer;
     for (var i in this.issues) {
-      if ((parseFloat(this.issues[i].number) === issueNumber || this.issues[issueNumber]) && !this.issues[i].annual) {
+      if ((this.issues[i].number === issueNumber || this.issues[issueNumber]) && !this.issues[i].annual) {
         found = true;
         issue = this.issues[i];
       }
     }
     if (!found) {
-      issue = new Issue(null);
+      issue = new IssueServer(null);
       this.issues[issueNumber] = issue;
     }
-    issue.update(comicVineJson);
+    issue.updateFromComicVine(comicVineJson);
   }
 
   parseIssues(config: Config) {
@@ -81,45 +54,39 @@ export class Comic {
           console.log("----Not an issue: " + element);
         }
       });
-      this.updateIssuesCount();
+      this.updateCount();
     })
   }
 
-  private updateIssuesCount() {
-    var possessed = 0;
-    var read = 0;
-    for (var issue in this.issues) {
-      if (!this.issues[issue].annual) {
-        if (this.issues[issue].readingStatus.read) {
-          read++;
-        }
-        if (this.issues[issue].possessed) {
-          possessed++;
-        }
-      }
-    }
-    this.count_of_possessed_issues = possessed;
-    this.count_of_read_issues = read;
-  }
   private analyseIssueName(issueName: string) {
-    if (this.issues[issueName]) {
-      return;
-    }
-    console.log("New Issue: " + issueName);
-    var issue: Issue = new Issue(null);
-    issue.folder_name = this.folder_name;
-    issue.file_name = issueName;
-    issue.possessed = true;
-    var issueNameSplitted = issueName.match(/(.*)_([0-9][0-9][0-9]\.?[0-9]*)_\(([0-9]*)\).*/)
-    if (issueNameSplitted && issueNameSplitted.length === 4) {
-      issue.title = issueNameSplitted[1].replace(/_/g, ' ');
-      issue.number = issueNameSplitted[2];
-      issue.year = issueNameSplitted[3];
-      if (issueName.indexOf("Annual") > 0) {
-        issue.annual = true;
+    var issue = this.issues[issueName];
+    if (!issue) {
+      console.log("New Issue: " + issueName);
+      issue = new IssueServer(null);
+      issue.folder_name = this.folder_name;
+      issue.file_name = issueName;
+      issue.possessed = true;
+      var issueNameSplitted = issueName.match(/(.*)_([0-9.]*)_\(([0-9]*)\).*/)
+      if (issueNameSplitted && issueNameSplitted.length === 4) {
+        issue.title = issueNameSplitted[1].replace(/_/g, ' ');
+        issue.number = parseFloat(issueNameSplitted[2]);
+        issue.year = issueNameSplitted[3];
+        if (issueName.indexOf("Annual") > 0) {
+          issue.annual = true;
+        }
       }
+      this.issues[issueName] = issue;
     }
-    this.issues[issueName] = issue;
+
+    if (this.issues[issue.number]) {
+      issue.update(this.issues[issue.number]);
+      delete this.issues[issue.number];
+      issue.folder_name = this.folder_name;
+      issue.file_name = issueName;
+      issue.possessed = true;
+      this.issues[issueName] = issue;
+      console.log("mapping new issue to comic vine issue");
+    }
   }
 
   findExactMapping(config: Config) {
@@ -233,18 +200,18 @@ export class Comic {
     if (this.issues[issueName]) {
       this.issues[issueName].markRead(false);
     }
-    this.updateIssuesCount();
+    this.updateCount();
   }
   markAllIssuesRead() {
     for (var issue in this.issues) {
       this.issues[issue].markRead(true);
     }
-    this.updateIssuesCount();
+    this.updateCount();
   }
-  updateReadingStatus(issue: Issue) {
+  updateReadingStatus(issue: IssueServer) {
     if (issue.file_name && this.issues[issue.file_name]) {
       this.issues[issue.file_name].readingStatus = issue.readingStatus;
     }
-    this.updateIssuesCount();
+    this.updateCount();
   }
 }

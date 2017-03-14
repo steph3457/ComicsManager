@@ -4,7 +4,7 @@ import logger = require('morgan');
 import cookieParser = require('cookie-parser');
 import bodyParser = require('body-parser');
 
-import { ComicsLibrary } from "./src/ComicsLibrary";
+import { ComicsLibrary } from "./src/lib/ComicsLibrary";
 
 var app = express();
 var comicsLibrary = new ComicsLibrary();
