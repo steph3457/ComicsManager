@@ -59,3 +59,6 @@ typings/
 
 temp/
 dist/
+
+config.json
+comicsLibrary.json
