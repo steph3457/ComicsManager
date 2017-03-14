@@ -28,14 +28,14 @@ export class LibraryService {
     });
     this.http.get('/getConfig').subscribe(res => {
       var config = res.json();
-      this.config = config;
+      this.config = new Config(config);
     });
   }
   updateCount() {
     this.count_of_possessed_issues = 0;
     this.count_of_read_issues = 0;
     for (var c in this.comics) {
-      
+
       var comic = this.comics[c];
       comic.updateCount();
       this.count_of_possessed_issues += comic.count_of_possessed_issues;
