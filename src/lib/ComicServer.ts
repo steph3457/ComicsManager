@@ -45,6 +45,10 @@ export class ComicServer extends Comic {
     const fs = require('fs');
     var issuesFolder = path.resolve(config.comicsPath, this.folder_name);
     fs.readdir(issuesFolder, (err, list) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
       console.log("Scanning: " + issuesFolder);
       list.forEach(element => {
         if (element.indexOf(".cbr") > 0 || element.indexOf(".cbz") > 0) {

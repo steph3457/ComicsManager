@@ -11,8 +11,7 @@ export class ComicsLibrary {
     config: Config;
     constructor() {
         var comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
-        var config = this.jsonfile.readFileSync(this.configFileName, { throws: false });
-        this.config = new Config(config);
+        this.config = new Config(this.jsonfile.readFileSync(this.configFileName, { throws: false }));
         for (var comic in comicsLibrary) {
             this.comics[comic] = new ComicServer(comicsLibrary[comic]);
         }
@@ -60,6 +59,10 @@ export class ComicsLibrary {
     parseComics() {
         const fs = require('fs');
         fs.readdir(this.config.comicsPath, ((err, list) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
             list.forEach(element => {
                 var file: string = path.resolve(this.config.comicsPath, element);
                 fs.stat(file, (function (err, stat) {
