@@ -96,4 +96,8 @@ export class Comic {
     this.count_of_possessed_issues = possessed;
     this.count_of_read_issues = read;
   }
+
+  public static ComicNameComparer(comic1: Comic, comic2: Comic) {
+    return comic1.title.localeCompare(comic2.title);
+  }
 }

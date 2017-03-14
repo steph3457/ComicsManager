@@ -181,6 +181,6 @@ export class LibraryService {
     for (var i in this.comics) {
       comics.push(this.comics[i]);
     }
-    return comics;
+    return comics.sort(Comic.ComicNameComparer);
   }
 }
