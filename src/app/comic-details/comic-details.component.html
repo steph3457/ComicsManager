@@ -1,10 +1,9 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <div id="title" [hidden]="edit">
-      <h2 (click)="editMode()">{{libraryService.comic.title}}</h2>{{libraryService.comic.comicVineId}}
-    </div>
-    <div id="input" [hidden]="!edit">
-      <h2 (click)="editMode()">{{libraryService.comic.title}}</h2><input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="libraryService.comic.comicVineId">
+      <h2 (click)="editMode()">{{libraryService.comic.title}} - {{libraryService.comic.publisher?.name}} ({{libraryService.comic.year}})</h2>
+      <div [hidden]="edit">{{libraryService.comic.comicVineId}}</div>
+      <div [hidden]="!edit"><input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="libraryService.comic.comicVineId"></div>
     </div>
   </div>
   <div class="panel-body">
