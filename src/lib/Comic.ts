@@ -97,7 +97,14 @@ export class Comic {
     this.count_of_read_issues = read;
   }
 
-  public static ComicNameComparer(comic1: Comic, comic2: Comic) {
-    return comic1.title.localeCompare(comic2.title);
+  public static ComicTitleComparer(comic1: Comic, comic2: Comic) {
+    if (comic1.title && comic2.title)
+      return comic1.title.localeCompare(comic2.title);
+    else return 0;
+  }
+  public static ComicYearComparer(comic1: Comic, comic2: Comic) {
+    if (comic1.year && comic2.year)
+      return comic1.year.localeCompare(comic2.year);
+    else return 0;
   }
 }

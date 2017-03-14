@@ -6,8 +6,8 @@
     <table class="table table-striped table-hover">
       <thead>
         <th>Image</th>
-        <th>Title</th>
-        <th>Year</th>
+        <th (click)="libraryService.sortBy('title')">Title</th>
+        <th (click)="libraryService.sortBy('year')">Year</th>
         <th>Publisher</th>
         <th>#Issues</th>
         <th>#Possessed Issues</th>

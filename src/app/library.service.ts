@@ -17,6 +17,10 @@ export class LibraryService {
   count_of_read_issues: number = 0;
   loading: boolean = false;
   config: Config;
+  comicsComparer: (c1: Comic, c2: Comic) => number = Comic.ComicTitleComparer;
+  issuesComparer: (i1: Issue, i2: Issue) => number = Issue.IssueNumberComparer;
+  comicsReverse: boolean = false;
+  issuesReverse: boolean = true;
 
   constructor(private http: Http, private router: Router) {
     this.http.get('/getLibrary').subscribe(res => {
@@ -103,13 +107,21 @@ export class LibraryService {
   }
   findExactMapping() {
     this.http.get('/findExactMapping').subscribe(res => {
-      this.comic.update(res.json());
+      var jsonRes = res.json();
+      this.comics = {};
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
+      }
       this.updateCount();
     });
   }
   updateComicsInfos() {
     this.http.get('/updateLibraryInfos').subscribe(res => {
-      this.comic.update(res.json());
+      var jsonRes = res.json();
+      this.comics = {};
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
+      }
       this.updateCount();
     });
   }
@@ -176,11 +188,34 @@ export class LibraryService {
   getPossessedCount(comic: Comic): number {
     return comic.count_of_possessed_issues;
   }
+
   getComics(): Comic[] {
     var comics: Comic[] = [];
     for (var i in this.comics) {
       comics.push(this.comics[i]);
     }
-    return comics.sort(Comic.ComicNameComparer);
+    comics = comics.sort(this.comicsComparer);
+    if (this.comicsReverse) {
+      comics = comics.reverse();
+    }
+    return comics;
+  }
+  sortBy(column: string) {
+    switch (column) {
+      case "title": {
+        if (this.comicsComparer === Comic.ComicTitleComparer)
+          this.comicsReverse = !this.comicsReverse;
+        this.comicsComparer = Comic.ComicTitleComparer;
+        break;
+      }
+      case "year": {
+        if (this.comicsComparer === Comic.ComicYearComparer)
+          this.comicsReverse = !this.comicsReverse;
+        this.comicsComparer = Comic.ComicYearComparer;
+        break;
+      }
+      default:
+        break;
+    }
   }
 }
