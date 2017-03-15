@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Comic } from "../lib/Comic";
 import { Issue } from "../lib/Issue";
 import { Config } from "../lib/Config";
+import { Filter } from "../lib/Filter";
 
 @Injectable()
 export class LibraryService {
@@ -19,6 +20,7 @@ export class LibraryService {
   config: Config;
   comicsComparer: (c1: Comic, c2: Comic) => number = Comic.ComicTitleComparer;
   comicsReverse: boolean = false;
+  filter: Filter = new Filter();
 
   constructor(private http: Http, private router: Router) {
     this.http.get('/getLibrary').subscribe(res => {
@@ -192,7 +194,8 @@ export class LibraryService {
   getComics(): Comic[] {
     var comics: Comic[] = [];
     for (var i in this.comics) {
-      comics.push(this.comics[i]);
+      if (this.filter.match(this.comics[i]))
+        comics.push(this.comics[i]);
     }
     comics = comics.sort(this.comicsComparer);
     if (this.comicsReverse) {

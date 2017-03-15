@@ -2,7 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { CollapseDirective } from 'ng2-bootstrap'
+import { CollapseDirective } from 'ng2-bootstrap';
+import { ButtonsModule } from 'ng2-bootstrap/buttons';
 
 import { AppComponent } from './app.component';
 import { ReaderComponent } from './reader/reader.component';
@@ -27,7 +28,8 @@ import { ConfigComponent } from './config/config.component';
     BrowserModule,
     FormsModule,
     HttpModule,
-    routing
+    routing,
+    ButtonsModule.forRoot()
   ],
   providers: [LibraryService],
   bootstrap: [AppComponent]
