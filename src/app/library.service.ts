@@ -130,10 +130,12 @@ export class LibraryService {
     });
   }
   updateComicVineId() {
-    this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
-      this.comic.update(res.json());
-      this.updateCount();
-    });
+    if (this.comic.comicVineId) {
+      this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
+        this.comic.update(res.json());
+        this.updateCount();
+      });
+    }
   }
   read(issue: Issue) {
     this.loading = true;

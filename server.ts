@@ -66,9 +66,13 @@ app.get('/updateLibraryInfos/:comic', function (req, res) {
     res.json(comicsLibrary.comics[req.params.comic]);
 });
 app.get('/updateComicVineId/:comic/:id', function (req, res) {
-    comicsLibrary.comics[req.params.comic].comicVineId = req.params.id;
-    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config);
-    res.json(comicsLibrary.comics[req.params.comic]);
+    var comicVineId = parseInt(req.params.id);
+    var comic = comicsLibrary.comics[req.params.comic];
+    if (comicVineId && comic.comicVineId !== comicVineId) {
+        comic.comicVineId = comicVineId;
+        comic.updateInfos(comicsLibrary.config);
+    }
+    res.json(comic);
 });
 app.post('/updateReadingStatus', function (req, res) {
     comicsLibrary.updateReadingStatus(req.body);
