@@ -3,7 +3,7 @@
     <h1>Config</h1>
   </div>
   <div class="panel-body">
-    <div>Comics path: <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"></div>    
+    <div>Comics path: <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"></div>
     <div>ComicVine API key: <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"></div>
     <div *ngFor="let publisher of libraryService.config.getPublishers()">
       {{publisher.name}}
@@ -17,14 +17,12 @@
     <h1>Special commands</h1>
   </div>
   <div class="panel-body">
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav navbar-right">
-        <li><a (click)="libraryService.parseComics()">Update comics</a></li>
-        <li><a (click)="libraryService.parseIssues()">Update issues</a></li>
-        <li><a (click)="libraryService.findExactMapping()">Update comics info with Comic Vine API</a></li>
-        <li><a (click)="libraryService.updateComicsInfos()">Update issues info with Comic Vine API</a></li>
-        <li><a (click)="libraryService.saveLibrary()">Save library</a></li>
-      </ul>
-    </div>
+    <ul class="nav navbar-nav">
+      <li><a (click)="libraryService.parseComics()">Update comics</a></li>
+      <li><a (click)="libraryService.parseIssues()">Update issues</a></li>
+      <li><a (click)="libraryService.findExactMapping()">Update comics info with Comic Vine API</a></li>
+      <li><a (click)="libraryService.updateComicsInfos()">Update issues info with Comic Vine API</a></li>
+      <li><a (click)="libraryService.saveLibrary()">Save library</a></li>
+    </ul>
   </div>
 </div>

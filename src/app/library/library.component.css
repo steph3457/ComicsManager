@@ -1,3 +1,27 @@
-.clickable:hover{
-    cursor: pointer;
+.readingStatus {
+  position: relative;
+  display: inline-block;
+}
+
+.readingStatus .badge {
+  position: absolute;
+  top: -1px;
+}
+
+.readingStatus .missing {
+  right: -1px;
+}
+
+.readingStatus .toRead {
+  left: -1px;
+}
+
+.badge {
+  color: black;
+}
+.toRead {
+  background: #d9edf7;
+}
+.missing {
+  background: #f2dede;
 }

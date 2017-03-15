@@ -1,5 +1,5 @@
 #!/bin/bash
 echo build...
-ng build -watch&
-tsc -w&
+ng build
+tsc
 exit 0

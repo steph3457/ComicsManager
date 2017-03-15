@@ -7,7 +7,7 @@
     </div>
   </div>
   <div class="panel-body">
-    <img *ngIf="libraryService.comic.image" [src]="libraryService.comic.image" class="description img-responsive">
+    <img *ngIf="libraryService.comic.image" [src]="libraryService.comic.image" class="thumb description img-responsive">
     <p [innerHTML]="libraryService.comic.description"></p>
   </div>
 </div>
@@ -24,7 +24,7 @@
         <th>Read</th>
       </thead>
       <tr *ngFor="let issue of libraryService.comic.getIssues()" [class]="issue.getClass()">
-        <td><img *ngIf="issue.image" src="{{issue.image}}" class="img-responsive"></td>
+        <td><img *ngIf="issue.image" src="{{issue.image}}" class="thumb img-responsive"></td>
         <td>{{issue.number}}</td>
         <td class="clickable" (click)="libraryService.read(issue)">{{issue.file_name}}</td>
         <td>{{issue.title}}</td>

@@ -32,7 +32,7 @@ export class ComicServer extends Comic {
     var found = false;
     var issue: IssueServer;
     for (var i in this.issues) {
-      if ((this.issues[i].number === issueNumber || this.issues[issueNumber]) && !this.issues[i].annual) {
+      if ((this.issues[i].number === issueNumber) && !this.issues[i].annual) {
         found = true;
         issue = this.issues[i];
       }

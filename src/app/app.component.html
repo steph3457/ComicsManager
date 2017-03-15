@@ -1,12 +1,19 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-inverse">
   <div class="container">
     <div class="navbar-header">
-      <a class="navbar-brand" [routerLink]="['/']">Home</a>
+      <button (click)="isCollapsed = !isCollapsed" type="button" class="navbar-toggle pull-xs-right hidden-sm-up" aria-controls="bd-main-nav">
+        {{menuIcon}}
+      </button>
+      <a (click)="isCollapsed = true" class="navbar-brand hidden-sm-up" [routerLink]="['/']">Comics Manager</a>
     </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
+    <div class="navbar-toggleable-xs navbar-collapse" id="bd-main-nav" [attr.aria-expanded]="!isCollapsed" [ngClass]="{collapse: isCollapsed}">
       <ul class="nav navbar-nav navbar-right">
-        <li><a [routerLink]="['/config']">Config</a></li>
-        <li><a (click)="libraryService.saveLibrary()">Save library</a></li>
+        <li (click)="isCollapsed = true" class="nav-item">
+          <a class="navbar-brand hidden-xs-down" [routerLink]="['/']">Home</a>
+        </li>
+        <li (click)="isCollapsed = true" class="nav-item">
+          <a class="navbar-brand hidden-xs-down" [routerLink]="['/config']">Config</a>
+        </li>
       </ul>
     </div>
   </div>

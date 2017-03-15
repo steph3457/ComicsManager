@@ -7,6 +7,10 @@ import { LibraryService } from './library.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  public isCollapsed: boolean = true;
   constructor(private libraryService: LibraryService) {
+  }
+  public get menuIcon(): string {
+    return this.isCollapsed ? '☰' : '✖';
   }
 }

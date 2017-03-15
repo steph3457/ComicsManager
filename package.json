@@ -25,6 +25,7 @@
     "express": "^4.15.2",
     "jsonfile": "^2.4.0",
     "morgan": "^1.8.1",
+    "ng2-bootstrap": "^1.4.0",
     "node-unrar": "^0.1.5",
     "path": "^0.12.7",
     "request": "^2.81.0",

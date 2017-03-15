@@ -19,6 +19,6 @@ img.description {
   float: left;
 }
 
-.clickable:hover {
-  cursor: pointer;
+img.thumb{
+  width: 100px;
 }
