@@ -21,8 +21,7 @@ import { ConfigComponent } from './config/config.component';
     ReaderComponent,
     LibraryComponent,
     ComicDetailsComponent,
-    ConfigComponent,
-    CollapseDirective
+    ConfigComponent
   ],
   imports: [
     BrowserModule,
