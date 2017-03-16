@@ -40,3 +40,7 @@
 .btn-group{
     margin-bottom: 5px;
 }
+
+.img-responsive{
+  min-width: 60px;
+}
