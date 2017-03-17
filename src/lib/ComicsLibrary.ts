@@ -39,6 +39,7 @@ export class ComicsLibrary {
         for (var comic in this.comics) {
             this.comics[comic].removeDuplicateIssues();
         }
+        this.saveLibrary();
     }
     updateLibraryInfos() {
         for (var comic in this.comics) {
