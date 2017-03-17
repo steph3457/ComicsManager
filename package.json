@@ -23,6 +23,7 @@
     "cookie-parser": "^1.4.3",
     "core-js": "^2.4.1",
     "express": "^4.15.2",
+    "fast-levenshtein": "^2.0.6",
     "jsonfile": "^2.4.0",
     "morgan": "^1.8.1",
     "ng2-bootstrap": "^1.4.0",

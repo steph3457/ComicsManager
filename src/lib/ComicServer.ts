@@ -101,7 +101,8 @@ export class ComicServer extends Comic {
       console.log("Mapping already exist for " + this.folder_name);
       return;
     }
-    var url = 'http://comicvine.gamespot.com/api/volumes/?api_key=' + config.comicVineAPI + '&limit=100&filter=name:' + encodeURIComponent(this.title) + '&format=json';
+    var page = 0;
+    var url = 'http://comicvine.gamespot.com/api/search/?api_key=' + config.comicVineAPI + '&limit=100' + '&page=' + page + '&query=' + encodeURI(this.title) + '&resources=volume&format=json';
     var headers = {
       'User-Agent': 'Super Agent/0.0.1',
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -109,16 +110,14 @@ export class ComicServer extends Comic {
     var options = {
       url: url,
       method: 'GET',
-      headers: headers,
-      offset: 0,
-      limit: 100
+      headers: headers
     }
     function callback(error, response, body) {
       if (!error && response.statusCode == 200) {
         var body = JSON.parse(body);
         var found = false;
         var nextPage = false;
-        if (body.number_of_total_results > body.offset + body.limit) {
+        if (body.number_of_total_results > body.page * body.limit) {
           nextPage = true;
         }
         var results = body.results;
@@ -127,20 +126,34 @@ export class ComicServer extends Comic {
           var comic = results[i];
           if (comic.publisher) {
           }
-          if (comic.name === this.title && comic.start_year === this.year && comic.publisher && config.publishers[comic.publisher.name]) {
+          var levenshtein = require('fast-levenshtein');
+          var distance = levenshtein.get(comic.name, this.title);
+          if (distance <= 1 && comic.start_year === this.year && comic.publisher && config.publishers[comic.publisher.name]) {
             console.log("Found : " + this.title);
             found = true;
             this.update(comic);
           }
         }
         if (!found && nextPage) {
-          options.offset += options.limit;
+          page++;
+          var url = 'http://comicvine.gamespot.com/api/search/?api_key=' + config.comicVineAPI + '&limit=100' + '&page=' + page + 'query=' + this.title + '&resources=volume&format=json';
+          var headers = {
+            'User-Agent': 'Super Agent/0.0.1',
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+          var options = {
+            url: url,
+            method: 'GET',
+            headers: headers
+          }
           request(options, callback);
         } else if (!found) {
           console.log("Not Found : " + this.title);
         }
-      } else
+      } else {
         console.log("Error: " + error);
+        console.log("Status: " + response.statusCode);
+      }
     }
     request(options, callback.bind(this));
   }
