@@ -105,6 +105,12 @@ export class Comic {
         this.issuesComparer = Issue.IssueNumberComparer;
         break;
       }
+      case "file": {
+        if (this.issuesComparer === Issue.IssueFileComparer)
+          this.issuesReverse = !this.issuesReverse;
+        this.issuesComparer = Issue.IssueFileComparer;
+        break;
+      }
       default:
         break;
 

@@ -2,3 +2,9 @@
 .clickable:hover{
     cursor: pointer;
 }
+
+.thead-default th {
+  color: #464a4c;
+  background-color: #eceeef;
+  padding: 10px;
+}

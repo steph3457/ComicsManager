@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { CollapseDirective } from 'ng2-bootstrap';
+import { CollapseDirective } from 'ng2-bootstrap/collapse';
 import { ButtonsModule } from 'ng2-bootstrap/buttons';
 
 import { AppComponent } from './app.component';

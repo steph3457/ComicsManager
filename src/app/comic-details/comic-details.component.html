@@ -15,10 +15,10 @@
 <div class="panel panel-default">
   <div class="table-responsive">
     <table class="table table-striped table-hover">
-      <thead>
+      <thead class="thead-default">
         <th>Image</th>
         <th (click)="libraryService.comic.sortBy('number')">#Issue</th>
-        <th>File name</th>
+        <th (click)="libraryService.comic.sortBy('file')">File name</th>
         <th (click)="libraryService.comic.sortBy('title')">Title</th>
         <th (click)="libraryService.comic.sortBy('date')">Date</th>
         <th>Read</th>

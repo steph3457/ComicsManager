@@ -56,6 +56,9 @@ export class Issue {
   public static IssueTitleComparer(issue1: Issue, issue2: Issue) {
     return issue1.title.localeCompare(issue2.title);
   }
+  public static IssueFileComparer(issue1: Issue, issue2: Issue) {
+    return issue1.file_name.localeCompare(issue2.file_name);
+  }
   public static IssueDateComparer(issue1: Issue, issue2: Issue) {
     if (!issue1.date)
       issue1.date = new Date();
