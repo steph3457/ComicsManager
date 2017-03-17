@@ -35,6 +35,11 @@ export class ComicsLibrary {
             this.comics[comic].findExactMapping(this.config);
         }
     }
+    removeDuplicateIssues() {
+        for (var comic in this.comics) {
+            this.comics[comic].removeDuplicateIssues();
+        }
+    }
     updateLibraryInfos() {
         for (var comic in this.comics) {
             this.comics[comic].updateInfos(this.config);

@@ -57,6 +57,10 @@ app.get('/findExactMapping', function (req, res) {
     comicsLibrary.findExactMapping();
     res.json(comicsLibrary.comics);
 });
+app.get('/removeDuplicateIssues', function (req, res) {
+    comicsLibrary.removeDuplicateIssues();
+    res.json(comicsLibrary.comics);
+});
 app.get('/updateLibraryInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos();
     res.json(comicsLibrary.comics);

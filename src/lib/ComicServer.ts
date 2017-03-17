@@ -96,6 +96,16 @@ export class ComicServer extends Comic {
     }
   }
 
+  removeDuplicateIssues() {
+    for (var i in this.issues) {
+      var issue = this.issues[i];
+      var issueNumber = parseFloat(i);
+      if (issueNumber !== issue.number && this.issues[issue.number]) {
+        delete this.issues[issue.number];
+      }
+    }
+  }
+
   findExactMapping(config: Config) {
     if (this.comicVineId) {
       console.log("Mapping already exist for " + this.folder_name);
