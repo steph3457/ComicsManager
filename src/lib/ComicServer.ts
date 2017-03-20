@@ -77,14 +77,25 @@ export class ComicServer extends Comic {
       issue.folder_name = this.folder_name;
       issue.file_name = issueName;
       issue.possessed = true;
-      var issueNameSplitted = issueName.match(/(.*)_([0-9.]*)_\(([0-9]*)\).*/)
+      var issueNameSplitted = issueName.match(/(.*)_([0-9.]*)_\(([0-9]*)\).*/);
+      if (!issueNameSplitted || issueNameSplitted.length !== 4) {
+        issueNameSplitted = issueName.match(/(.*) ([0-9.]*) \(([0-9]*)\).*/);
+      }
       if (issueNameSplitted && issueNameSplitted.length === 4) {
         issue.title = issueNameSplitted[1].replace(/_/g, ' ');
         issue.number = parseFloat(issueNameSplitted[2]);
         issue.year = issueNameSplitted[3];
-        if (issueName.indexOf("Annual") > 0) {
-          issue.annual = true;
+      }
+      else {
+        issueNameSplitted = issueName.match(/(.*) #([0-9]*).*/);
+        if (issueNameSplitted && issueNameSplitted.length === 3) {
+          issue.title = issueNameSplitted[1].replace(/_/g, ' ');
+          issue.number = parseFloat(issueNameSplitted[2]);
         }
+      }
+      
+      if (issueName.indexOf("Annual") > 0) {
+        issue.annual = true;
       }
       this.issues[issueName] = issue;
     }

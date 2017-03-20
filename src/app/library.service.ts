@@ -154,7 +154,7 @@ export class LibraryService {
   }
   getImageUrl(image: string): string {
     if (this.issue && image) {
-      return "/image/" + encodeURI(this.issue.folder_name) + "/" + encodeURI(this.issue.file_name) + "/" + encodeURI(image);
+      return "/image/" + encodeURIComponent(this.issue.folder_name) + "/" + encodeURIComponent(this.issue.file_name) + "/" + encodeURIComponent(image);
     }
     return "";
   }
