@@ -34,6 +34,7 @@ export class Issue {
     }
     else {
       this.readingStatus = new ReadingStatus(null);
+      this.date = new Date();
     }
   }
 
