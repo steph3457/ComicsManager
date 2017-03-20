@@ -88,7 +88,7 @@ export class LibraryService {
   }
   backToComic() {
     this.http.post('/updateReadingStatus', this.issue).subscribe(res => {
-      this.comic.update(res.json());
+      this.comic = new Comic(res.json());
       this.updateCount();
     });
     this.fullScreen(false);
@@ -101,7 +101,7 @@ export class LibraryService {
       body.file_name = issue.file_name;
     }
     this.http.post('/markRead', body).subscribe(res => {
-      this.comic.update(res.json());
+      this.comic = new Comic(res.json());
       this.updateCount();
     });
   }
@@ -127,14 +127,14 @@ export class LibraryService {
   }
   updateComicInfos() {
     this.http.get('/updateLibraryInfos/' + encodeURI(this.comic.folder_name)).subscribe(res => {
-      this.comic.update(res.json());
+      this.comic = new Comic(res.json());
       this.updateCount();
     });
   }
   updateComicVineId() {
     if (this.comic.comicVineId) {
       this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
-        this.comic.update(res.json());
+         this.comic = new Comic(res.json());
         this.updateCount();
       });
     }

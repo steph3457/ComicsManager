@@ -10,8 +10,10 @@ export class ComicServer extends Comic {
   issues: { [name: string]: IssueServer } = {};
   constructor(comic: ComicServer) {
     super(comic);
-    for (var issue in comic.issues) {
-      this.issues[issue] = new IssueServer(comic.issues[issue]);
+    if (comic) {
+      for (var issue in comic.issues) {
+        this.issues[issue] = new IssueServer(comic.issues[issue]);
+      }
     }
   }
 
@@ -32,7 +34,7 @@ export class ComicServer extends Comic {
     var found = false;
     var issue: IssueServer;
     for (var i in this.issues) {
-      if ((this.issues[i].number === issueNumber) && !this.issues[i].annual) {
+      if ((this.issues[i].number == issueNumber) && !this.issues[i].annual) {
         found = true;
         issue = this.issues[i];
       }
@@ -44,12 +46,13 @@ export class ComicServer extends Comic {
     issue.updateFromComicVine(comicVineJson);
   }
 
-  parseIssues(config: Config) {
+  parseIssues(comicsPath: string, callback) {
     const fs = require('fs');
-    var issuesFolder = path.resolve(config.comicsPath, this.folder_name);
+    var issuesFolder = path.resolve(comicsPath, this.folder_name);
     fs.readdir(issuesFolder, (err, list) => {
       if (err) {
         console.log(err);
+        callback(err);
         return;
       }
       console.log("Scanning: " + issuesFolder);
@@ -62,6 +65,7 @@ export class ComicServer extends Comic {
         }
       });
       this.updateCount();
+      callback();
     })
   }
 
@@ -86,7 +90,7 @@ export class ComicServer extends Comic {
     }
 
     if (this.issues[issue.number]) {
-      issue.update(this.issues[issue.number]);
+      issue = new IssueServer(this.issues[issue.number]);
       delete this.issues[issue.number];
       issue.folder_name = this.folder_name;
       issue.file_name = issueName;
@@ -106,7 +110,7 @@ export class ComicServer extends Comic {
     }
   }
 
-  findExactMapping(config: Config) {
+  findExactMapping(config: Config, callback) {
     if (this.comicVineId) {
       console.log("Mapping already exist for " + this.folder_name);
       return;
@@ -122,7 +126,10 @@ export class ComicServer extends Comic {
       method: 'GET',
       headers: headers
     }
-    function callback(error, response, body) {
+    function requestCallback(error, response, body) {
+      if (error) {
+        callback(error);
+      }
       if (!error && response.statusCode == 200) {
         var body = JSON.parse(body);
         var found = false;
@@ -160,21 +167,22 @@ export class ComicServer extends Comic {
         } else if (!found) {
           console.log("Not Found : " + this.title);
         }
+        callback();
       } else {
         console.log("Error: " + error);
         console.log("Status: " + response.statusCode);
       }
     }
-    request(options, callback.bind(this));
+    request(options, requestCallback.bind(this));
   }
 
-  updateInfos(config: Config) {
+  updateInfos(config: Config, callback) {
     if (!this.comicVineId) {
       console.log("unable to find extra information in comic vine for " + this.folder_name);
       return;
     }
     this.updateComicInfos(config);
-    this.updateIssuesInfos(config);
+    this.updateIssuesInfos(config, callback);
   }
   private updateComicInfos(config: Config) {
     var url = "http://comicvine.gamespot.com/api/volume/4050-" + this.comicVineId + "/?api_key=" + config.comicVineAPI + "&format=json";
@@ -197,7 +205,7 @@ export class ComicServer extends Comic {
     }
     request(options, callback.bind(this));
   }
-  private updateIssuesInfos(config: Config) {
+  private updateIssuesInfos(config: Config, callback) {
     var url = "http://comicvine.gamespot.com/api/issues/?api_key=" + config.comicVineAPI + "&filter=volume:" + this.comicVineId + "&format=json";
     var headers = {
       'User-Agent': 'Super Agent/0.0.1',
@@ -208,7 +216,10 @@ export class ComicServer extends Comic {
       method: 'GET',
       headers: headers
     }
-    function callback(error, response, body) {
+    function requestCallback(error, response, body) {
+      if (error) {
+        callback(error);
+      }
       if (!error && response.statusCode == 200) {
         var body = JSON.parse(body);
         console.dir(body);
@@ -216,9 +227,10 @@ export class ComicServer extends Comic {
         for (var i in issues) {
           this.updateIssueInformation(issues[i]);
         }
+        callback();
       }
     }
-    request(options, callback.bind(this));
+    request(options, requestCallback.bind(this));
   }
 
   read(issueName: string, config: Config, res) {

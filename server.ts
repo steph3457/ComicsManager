@@ -46,37 +46,31 @@ app.get('/saveLibrary', function (req, res) {
     res.json(comicsLibrary.comics);
 });
 app.get('/parseComics', function (req, res) {
-    comicsLibrary.parseComics();
-    res.json(comicsLibrary.comics);
+    comicsLibrary.parseComics(res);
 });
 app.get('/parseIssues', function (req, res) {
-    comicsLibrary.parseIssues();
-    res.json(comicsLibrary.comics);
+    comicsLibrary.parseIssues(res);
 });
 app.get('/findExactMapping', function (req, res) {
-    comicsLibrary.findExactMapping();
-    res.json(comicsLibrary.comics);
+    comicsLibrary.findExactMapping(res);
 });
 app.get('/removeDuplicateIssues', function (req, res) {
     comicsLibrary.removeDuplicateIssues();
     res.json(comicsLibrary.comics);
 });
 app.get('/updateLibraryInfos', function (req, res) {
-    comicsLibrary.updateLibraryInfos();
-    res.json(comicsLibrary.comics);
+    comicsLibrary.updateLibraryInfos(res);
 });
 app.get('/updateLibraryInfos/:comic', function (req, res) {
-    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config);
-    res.json(comicsLibrary.comics[req.params.comic]);
+    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config, (err)=>{res.json(comicsLibrary.comics[req.params.comic]);});
 });
 app.get('/updateComicVineId/:comic/:id', function (req, res) {
     var comicVineId = parseInt(req.params.id);
     var comic = comicsLibrary.comics[req.params.comic];
     if (comicVineId && comic.comicVineId !== comicVineId) {
         comic.comicVineId = comicVineId;
-        comic.updateInfos(comicsLibrary.config);
+        comic.updateInfos(comicsLibrary.config, (err)=>{res.json(comicsLibrary.comics[req.params.comic]);});
     }
-    res.json(comic);
 });
 app.post('/updateReadingStatus', function (req, res) {
     comicsLibrary.updateReadingStatus(req.body);

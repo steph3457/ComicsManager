@@ -14,7 +14,7 @@ export class IssueServer extends Issue {
     this.api_detail_url = comicVineJson.api_detail_url;
     this.site_detail_url = comicVineJson.site_detail_url;
     this.comicVineId = comicVineJson.id;
-    this.number = comicVineJson.issue_number;
+    this.number = parseFloat(comicVineJson.issue_number);
     this.image = comicVineJson.image.thumb_url;
     this.date = comicVineJson.store_date;
     //this.description= comicVineJson.description;

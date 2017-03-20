@@ -16,14 +16,6 @@ export class Issue {
   date: Date;
   constructor(issue: Issue) {
     if (issue) {
-      this.update(issue);
-    }
-    else {
-      this.readingStatus = new ReadingStatus(null);
-    }
-  }
-  update(issue: Issue) {
-    if (issue) {
       if (issue.folder_name)
         this.folder_name = issue.folder_name;
       if (issue.file_name)
@@ -39,6 +31,9 @@ export class Issue {
       this.annual = issue.annual;
       this.readingStatus = new ReadingStatus(issue.readingStatus);
       this.date = new Date(issue.date);
+    }
+    else {
+      this.readingStatus = new ReadingStatus(null);
     }
   }
 

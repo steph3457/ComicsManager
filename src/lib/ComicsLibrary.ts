@@ -1,4 +1,5 @@
 import path = require('path');
+import async = require('async');
 import { ComicServer } from "./ComicServer";
 import { IssueServer } from "./IssueServer";
 import { Config } from "./Config";
@@ -30,10 +31,18 @@ export class ComicsLibrary {
         });
     }
 
-    findExactMapping() {
-        for (var comic in this.comics) {
-            this.comics[comic].findExactMapping(this.config);
+    findExactMapping(res) {
+        function response(err) {
+            if (err) {
+                console.log(err);
+            }
+            this.saveLibrary();
+            res.json(this.comics);
         }
+        function findExactMapping(comic: ComicServer, callback) {
+            comic.findExactMapping(this.config, callback);
+        }
+        async.each(this.comics, findExactMapping.bind(this), response.bind(this));
     }
     removeDuplicateIssues() {
         for (var comic in this.comics) {
@@ -41,10 +50,18 @@ export class ComicsLibrary {
         }
         this.saveLibrary();
     }
-    updateLibraryInfos() {
-        for (var comic in this.comics) {
-            this.comics[comic].updateInfos(this.config);
+    updateLibraryInfos(res) {
+        function response(err) {
+            if (err) {
+                console.log(err);
+            }
+            this.saveLibrary();
+            res.json(this.comics);
         }
+        function updateInfos(comic: ComicServer, callback) {
+            comic.updateInfos(this.config, callback);
+        }
+        async.each(this.comics, updateInfos.bind(this), response.bind(this));
     }
     private analyseComicsFolderName(folderName: string) {
         if (this.comics[folderName]) {
@@ -62,27 +79,52 @@ export class ComicsLibrary {
         };
         this.comics[folderName] = comic;
     }
-    parseComics() {
+    parseComics(res) {
         const fs = require('fs');
-        fs.readdir(this.config.comicsPath, ((err, list) => {
+
+        function response(err) {
+            if (err) {
+                console.log(err);
+            }
+            this.saveLibrary();
+            res.json(this.comics);
+        }
+        function parseFile(element, callback) {
+            var file: string = path.resolve(comicsPath, element);
+            fs.stat(file, (function (err, stat) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+                if (stat && stat.isDirectory()) {
+                    this.analyseComicsFolderName(element);
+                }
+                callback();
+            }).bind(this))
+        }
+
+        var comicsPath = this.config.comicsPath;
+        fs.readdir(comicsPath, ((err, list) => {
             if (err) {
                 console.log(err);
                 return;
             }
-            list.forEach(element => {
-                var file: string = path.resolve(this.config.comicsPath, element);
-                fs.stat(file, (function (err, stat) {
-                    if (stat && stat.isDirectory()) {
-                        this.analyseComicsFolderName(element);
-                    }
-                }).bind(this))
-            });
+            async.each(list, parseFile.bind(this), response.bind(this));
         }).bind(this))
     }
-    parseIssues() {
-        for (var comic in this.comics) {
-            this.comics[comic].parseIssues(this.config);
+    parseIssues(res) {
+        var comicsPath = this.config.comicsPath;
+        function response(err) {
+            if (err) {
+                console.log(err);
+            }
+            this.saveLibrary();
+            res.json(this.comics);
         }
+        function parseIssues(comic: ComicServer, callback) {
+            comic.parseIssues(comicsPath, callback);
+        }
+        async.each(this.comics, parseIssues, response.bind(this));
     }
     read(req, res) {
         if (req.comic && this.comics[req.comic] && req.issue) {
