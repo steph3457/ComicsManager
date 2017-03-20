@@ -57,7 +57,7 @@ export class ComicServer extends Comic {
       }
       console.log("Scanning: " + issuesFolder);
       list.forEach(element => {
-        if (element.indexOf(".cbr") > 0 || element.indexOf(".cbz") > 0) {
+        if (element.indexOf("._") !== 0 && (element.indexOf(".cbr") !== -1 || element.indexOf(".cbz") !== -1)) {
           this.analyseIssueName(element);
         }
         else {
