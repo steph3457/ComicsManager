@@ -3,6 +3,7 @@ import { Config } from "./Config";
 import path = require('path');
 import Unrar = require('node-unrar');
 import { ReadingStatus } from "./ReadingStatus";
+import { unzip } from 'cross-unzip';
 
 export class IssueServer extends Issue {
   constructor(issue: IssueServer) {
@@ -31,34 +32,33 @@ export class IssueServer extends Issue {
     }
     if (!fs.existsSync(tempPath)) {
       fs.mkdirSync(tempPath);
-      try {
-        var AdmZip = require('adm-zip');
-        var zip = new AdmZip(issuePath);
-        zip.extractAllTo(tempPath);
-        var zipEntries = zip.getEntries();
-        var imageList = [];
-        for (var i in zipEntries) {
-          imageList.push(zipEntries[i].name);
+      unzip(issuePath, tempPath, err => {
+        if (err) {
+          console.log("unzip fail, try unrar");
+          var rar = new Unrar(issuePath);
+          rar.extract(tempPath, null, (function (err) {
+            console.log(err);
+            this.sendImages(res);
+          }).bind(this));
+        } else {
+          this.sendImages(res);
         }
-        this.sendImages(res, imageList);
-      }
-      catch (e) {
-        var rar = new Unrar(issuePath);
-        rar.extract(tempPath, null, (function (err) {
-          console.log(err);
-          this.sendImages(res, null);
-        }).bind(this));
-      }
+      })
     }
     else {
-      this.sendImages(res, null);
+      this.sendImages(res);
     }
   }
-  sendImages(res, imageList: string[]) {
+  sendImages(res) {
     const fs = require('fs');
+    var imageList: string[] = [];
     var tempPath = path.resolve("./temp", this.folder_name, this.file_name);
-    if (!imageList) {
+    imageList = fs.readdirSync(tempPath);
+    if (imageList.length === 1) {
+      var extraFolder = imageList[0];
+      tempPath = path.resolve(tempPath, extraFolder);
       imageList = fs.readdirSync(tempPath);
+      imageList = imageList.map(x => extraFolder + "/" + x);
     }
     res.json(imageList);
   }
