@@ -93,7 +93,7 @@ export class ComicServer extends Comic {
           issue.number = parseFloat(issueNameSplitted[2]);
         }
       }
-      
+
       if (issueName.indexOf("Annual") > 0) {
         issue.annual = true;
       }
@@ -190,6 +190,7 @@ export class ComicServer extends Comic {
   updateInfos(config: Config, callback) {
     if (!this.comicVineId) {
       console.log("unable to find extra information in comic vine for " + this.folder_name);
+      callback();
       return;
     }
     this.updateComicInfos(config);
@@ -209,7 +210,6 @@ export class ComicServer extends Comic {
     function callback(error, response, body) {
       if (!error && response.statusCode == 200) {
         var body = JSON.parse(body);
-        console.dir(body);
         var comic = body.results;
         this.update(comic);
       }
@@ -233,7 +233,6 @@ export class ComicServer extends Comic {
       }
       if (!error && response.statusCode == 200) {
         var body = JSON.parse(body);
-        console.dir(body);
         var issues = body.results;
         for (var i in issues) {
           this.updateIssueInformation(issues[i]);
