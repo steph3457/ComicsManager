@@ -134,23 +134,25 @@ export class LibraryService {
   updateComicVineId() {
     if (this.comic.comicVineId) {
       this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
-         this.comic = new Comic(res.json());
+        this.comic = new Comic(res.json());
         this.updateCount();
       });
     }
   }
   read(issue: Issue) {
-    this.loading = true;
-    this.fullScreen(true);
-    var body: any = { comic: this.comic.folder_name, issue: issue.file_name };
-    this.http.post('/read', body).subscribe(res => {
-      this.issue = issue;
-      this.images = res.json();
-      this.issue.readingStatus.pageCount = this.images.length;
-      this.router.navigate(['/reader']);
-      this.loading = false;
-      window.scrollTo(0, 0);
-    });
+    if (issue.possessed) {
+      this.loading = true;
+      this.fullScreen(true);
+      var body: any = { comic: this.comic.folder_name, issue: issue.file_name };
+      this.http.post('/read', body).subscribe(res => {
+        this.issue = issue;
+        this.images = res.json();
+        this.issue.readingStatus.pageCount = this.images.length;
+        this.router.navigate(['/reader']);
+        this.loading = false;
+        window.scrollTo(0, 0);
+      });
+    }
   }
   getImageUrl(image: string): string {
     if (this.issue && image) {
