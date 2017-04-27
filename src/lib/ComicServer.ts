@@ -57,7 +57,7 @@ export class ComicServer extends Comic {
       }
       console.log("Scanning: " + issuesFolder);
       list.forEach(element => {
-        if (element.indexOf("._") !== 0 && (element.indexOf(".cbr") !== -1 || element.indexOf(".cbz") !== -1)) {
+        if (element.indexOf("._") !== 0 && element.match(/\.(cbr|cbz)$/i)) {
           this.analyseIssueName(element);
         }
         else {
@@ -77,10 +77,7 @@ export class ComicServer extends Comic {
       issue.folder_name = this.folder_name;
       issue.file_name = issueName;
       issue.possessed = true;
-      var issueNameSplitted = issueName.match(/(.*)_([0-9.]*)_\(([0-9]*)\).*/);
-      if (!issueNameSplitted || issueNameSplitted.length !== 4) {
-        issueNameSplitted = issueName.match(/(.*) ([0-9.]*) \(([0-9]*)\).*/);
-      }
+      var issueNameSplitted = issueName.match(/(.*?)([0-9.]{2,}).*\(([0-9]{4})\).*/);
       if (issueNameSplitted && issueNameSplitted.length === 4) {
         issue.title = issueNameSplitted[1].replace(/_/g, ' ');
         issue.number = parseFloat(issueNameSplitted[2]);
@@ -152,11 +149,10 @@ export class ComicServer extends Comic {
 
         for (var i = 0; i < results.length; i++) {
           var comic = results[i];
-          if (comic.publisher) {
-          }
-          var levenshtein = require('fast-levenshtein');
-          var distance = levenshtein.get(comic.name, this.title);
-          if (distance <= 1 && comic.start_year === this.year && comic.publisher && config.publishers[comic.publisher.name]) {
+          var comicName = comic.name.replace(/[\- :()_&,/\\]/g, '').toLowerCase();
+          var title = this.title.replace(/[\- :()_&,/\\]/g, '').toLowerCase();
+          
+          if (comicName === title && comic.start_year === this.year && comic.publisher && config.publishers[comic.publisher.name]) {
             console.log("Found : " + this.title);
             found = true;
             this.update(comic);

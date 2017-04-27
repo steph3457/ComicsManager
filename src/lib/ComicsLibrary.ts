@@ -69,7 +69,7 @@ export class ComicsLibrary {
         }
         var comic: ComicServer = new ComicServer(null);
         comic.folder_name = folderName;
-        var folderNameSplitted = folderName.match(/(.*)_\(([0-9]*)\)$/)
+        var folderNameSplitted = folderName.match(/(.*)\(([0-9]{4})\)$/)
         if (folderNameSplitted && folderNameSplitted.length === 3) {
             comic.title = folderNameSplitted[1].replace(/_/g, ' ');
             comic.year = folderNameSplitted[2];
