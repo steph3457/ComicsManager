@@ -10,8 +10,8 @@
          uncheckable>Unread</label>
           <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="missing"
          uncheckable>Missing</label>
-         <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="mapped"
-         uncheckable>Mapped</label>
+         <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="unmapped"
+         uncheckable>Unmapped</label>
         </div>
         <input type="text" id="search" [(ngModel)]="libraryService.filter.search" placeholder="Filter by name...">
         <table class="table table-striped table-hover">

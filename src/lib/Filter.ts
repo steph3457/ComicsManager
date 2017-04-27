@@ -17,8 +17,8 @@ export class Filter {
                 return this.matchUnread(comic);
             case "missing":
                 return this.matchMissing(comic);
-            case "mapped":
-                return this.matchMapped(comic);
+            case "unmapped":
+                return this.matchunmapped(comic);
             default:
                 return true;
         }
@@ -30,10 +30,10 @@ export class Filter {
     private matchMissing(comic: Comic): boolean {
         return comic.count_of_issues > comic.count_of_possessed_issues;
     }
-    private matchMapped(comic: Comic): boolean {
+    private matchunmapped(comic: Comic): boolean {
         if (comic.comicVineId) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 }
