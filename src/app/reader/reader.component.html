@@ -1,4 +1,4 @@
-<div>
+<div (window:keydown)=libraryService.navigate($event.keyCode)>
   <ul>
     <li *ngFor="let image of images; let i = index">
       <div class="image" [hidden]="!libraryService.isCurrentPage(i)">

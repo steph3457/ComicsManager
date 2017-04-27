@@ -175,6 +175,23 @@ export class LibraryService {
     if (this.issue.readingStatus.currentPage > 0)
       this.issue.readingStatus.currentPage--;
   }
+  navigate(keyCode) {
+    switch (keyCode) {
+      case 32:
+      case 39:
+        this.nextPage();
+        break;
+      case 37:
+        this.previousPage()
+        break;
+      case 13:
+        this.backToComic();
+        break;
+      default:
+        console.log(keyCode);
+        break;
+    }
+  }
   fullScreen(on: boolean) {
     if (on) {
       if (document.body.webkitRequestFullScreen)
