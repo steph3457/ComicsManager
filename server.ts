@@ -41,6 +41,10 @@ app.post('/saveConfig', function (req, res) {
 app.get('/getLibrary', function (req, res) {
     res.json(comicsLibrary.comics);
 });
+app.get('/reloadLibrary', function (req, res) {
+    comicsLibrary.loadLibrary();
+    res.json(comicsLibrary.comics);
+});
 app.get('/saveLibrary', function (req, res) {
     comicsLibrary.saveLibrary();
     res.json(comicsLibrary.comics);

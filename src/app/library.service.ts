@@ -76,6 +76,16 @@ export class LibraryService {
       this.updateCount();
     });
   }
+  reloadLibrary() {
+    this.http.get('/reloadLibrary').subscribe(res => {
+      var jsonRes = res.json();
+      this.comics = {};
+      for (var comic in jsonRes) {
+        this.comics[comic] = new Comic(jsonRes[comic]);
+      }
+      this.updateCount();
+    });
+  }
   saveConfig() {
     this.http.post('/saveConfig', this.config).subscribe(res => {
       this.config = res.json();

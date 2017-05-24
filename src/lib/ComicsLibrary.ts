@@ -11,8 +11,12 @@ export class ComicsLibrary {
     comics: { [name: string]: ComicServer; } = {};
     config: Config;
     constructor() {
-        var comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
         this.config = new Config(this.jsonfile.readFileSync(this.configFileName, { throws: false }));
+        this.loadLibrary();
+    }
+    loadLibrary() {
+        this.comics = {};
+        var comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
         for (var comic in comicsLibrary) {
             this.comics[comic] = new ComicServer(comicsLibrary[comic]);
         }
