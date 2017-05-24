@@ -60,7 +60,9 @@ export class ComicsLibrary {
                 console.log(err);
             }
             this.saveLibrary();
-            res.json(this.comics);
+            if (res) {
+                res.json(this.comics);
+            }
         }
         function updateInfos(comic: ComicServer, callback) {
             comic.updateInfos(this.config, callback);

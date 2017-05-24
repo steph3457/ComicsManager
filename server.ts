@@ -66,14 +66,14 @@ app.get('/updateLibraryInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos(res);
 });
 app.get('/updateLibraryInfos/:comic', function (req, res) {
-    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config, (err)=>{res.json(comicsLibrary.comics[req.params.comic]);});
+    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config, (err) => { res.json(comicsLibrary.comics[req.params.comic]); });
 });
 app.get('/updateComicVineId/:comic/:id', function (req, res) {
     var comicVineId = parseInt(req.params.id);
     var comic = comicsLibrary.comics[req.params.comic];
     if (comicVineId && comic.comicVineId !== comicVineId) {
         comic.comicVineId = comicVineId;
-        comic.updateInfos(comicsLibrary.config, (err)=>{res.json(comicsLibrary.comics[req.params.comic]);});
+        comic.updateInfos(comicsLibrary.config, (err) => { res.json(comicsLibrary.comics[req.params.comic]); });
     }
 });
 app.post('/updateReadingStatus', function (req, res) {
@@ -95,4 +95,10 @@ app.get('/image/:comic/:issue/:image', function (req, res) {
 
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!');
+});
+
+var schedule = require('node-schedule');
+schedule.scheduleJob('0 7 * * 3', function () {
+    console.log("[Schedule task] Update library information on: " + new Date());
+    comicsLibrary.updateLibraryInfos(null);
 });
