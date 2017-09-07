@@ -9,9 +9,10 @@
       {{publisher.name}}
     </div>
     <button (click)="libraryService.saveConfig()">Save config</button>
+    <button (click)="test()">test</button>
   </div>
 </div>
-
+<simple-notifications [options]="options"></simple-notifications>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h1>Special commands</h1>
