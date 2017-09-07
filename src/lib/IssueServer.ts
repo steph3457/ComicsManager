@@ -1,8 +1,8 @@
-import { Issue } from "./Issue";
-import { Config } from "./Config";
-import path = require('path');
-import Unrar = require('node-unrar');
-import { ReadingStatus } from "./ReadingStatus";
+import { Issue } from './Issue';
+import { Config } from './Config';
+import * as path from 'path';
+import * as Unrar from 'node-unrar';
+import { ReadingStatus } from './ReadingStatus';
 import { unzip } from 'cross-unzip';
 
 export class IssueServer extends Issue {
@@ -23,8 +23,8 @@ export class IssueServer extends Issue {
 
   readFile(config: Config, res) {
     var issuePath = path.resolve(config.comicsPath, this.folder_name, this.file_name);
-    var tempPath = path.resolve("./temp", this.folder_name, this.file_name);
-    var tempComicPath = path.resolve("./temp", this.folder_name);
+    var tempPath = path.resolve('./temp', this.folder_name, this.file_name);
+    var tempComicPath = path.resolve('./temp', this.folder_name);
     const fs = require('fs');
 
     if (!fs.existsSync(tempComicPath)) {

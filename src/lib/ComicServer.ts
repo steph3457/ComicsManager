@@ -1,9 +1,9 @@
-import { Comic } from "./Comic";
-import request = require('request');
-import { Config } from "./Config";
-import { IssueServer } from "./IssueServer";
-import { Publisher } from "./Publisher";
-import path = require('path');
+import { Comic } from './Comic';
+import * as request from 'request';
+import { Config } from './Config';
+import { IssueServer } from './IssueServer';
+import { Publisher } from './Publisher';
+import * as path from 'path';
 
 export class ComicServer extends Comic {
 
