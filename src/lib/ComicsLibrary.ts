@@ -1,13 +1,13 @@
-import path = require('path');
-import async = require('async');
-import { ComicServer } from "./ComicServer";
-import { IssueServer } from "./IssueServer";
-import { Config } from "./Config";
+import * as path from 'path';
+import * as async from 'async';
+import { ComicServer } from './ComicServer';
+import { IssueServer } from './IssueServer';
+import { Config } from './Config';
 
 export class ComicsLibrary {
     private jsonfile = require('jsonfile');
-    private comicsLibraryFileName = "comicsLibrary.json";
-    private configFileName = "config.json";
+    private comicsLibraryFileName = 'comicsLibrary.json';
+    private configFileName = 'config.json';
     comics: { [name: string]: ComicServer; } = {};
     config: Config;
     constructor() {
@@ -16,8 +16,8 @@ export class ComicsLibrary {
     }
     loadLibrary() {
         this.comics = {};
-        var comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
-        for (var comic in comicsLibrary) {
+        const comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
+        for (const comic in comicsLibrary) {
             this.comics[comic] = new ComicServer(comicsLibrary[comic]);
         }
     }
