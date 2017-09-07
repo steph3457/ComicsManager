@@ -9,7 +9,7 @@ import { LibraryService } from '../library.service';
 export class ReaderComponent implements OnInit {
 
   images: string[] = [];
-  constructor(private libraryService: LibraryService) {
+  constructor(public libraryService: LibraryService) {
     this.images = libraryService.images;
   }
   ngOnInit() {

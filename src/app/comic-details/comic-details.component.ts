@@ -11,7 +11,7 @@ import { Issue } from "../../lib/Issue";
 export class ComicDetailsComponent implements OnInit {
 
   edit: boolean = false;
-  constructor(private libraryService: LibraryService) { }
+  constructor(public libraryService: LibraryService) { }
 
   editMode() {
     this.edit = !this.edit;

@@ -16,8 +16,8 @@ export class ConfigComponent implements OnInit {
   public notif;
 
   constructor(
-    private libraryService: LibraryService,
-    private notificationsService: NotificationsService
+    public libraryService: LibraryService,
+    public notificationsService: NotificationsService
   ) { }
 
   open() {

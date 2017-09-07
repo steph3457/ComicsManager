@@ -8,7 +8,7 @@ import { Comic } from "../../lib/Comic";
 })
 export class LibraryComponent implements OnInit {
 
-  constructor(private libraryService: LibraryService) { }
+  constructor(public libraryService: LibraryService) { }
   ngOnInit() {
   }
 
