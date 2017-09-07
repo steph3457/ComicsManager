@@ -15,6 +15,7 @@ import { LibraryService } from "./library.service";
 import { routing } from "./app.routes";
 import { ConfigComponent } from "./config/config.component";
 import { SimpleNotificationsModule } from "angular2-notifications";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     declarations: [
@@ -26,6 +27,7 @@ import { SimpleNotificationsModule } from "angular2-notifications";
     ],
     imports: [
         BrowserModule,
+        BrowserAnimationsModule,
         FormsModule,
         HttpModule,
         routing,

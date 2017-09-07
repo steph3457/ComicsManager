@@ -9,7 +9,6 @@
       {{publisher.name}}
     </div>
     <button (click)="libraryService.saveConfig()">Save config</button>
-    <button (click)="test()">test</button>
   </div>
 </div>
 <simple-notifications [options]="options"></simple-notifications>
@@ -19,12 +18,12 @@
   </div>
   <div class="panel-body">
     <ul class="nav navbar-nav">
-      <li><a (click)="libraryService.parseComics()">Update comics</a></li>
-      <li><a (click)="libraryService.parseIssues()">Update issues</a></li>
-      <li><a (click)="libraryService.findExactMapping()">Update comics info with Comic Vine API</a></li>
-      <li><a (click)="libraryService.updateComicsInfos()">Update issues info with Comic Vine API</a></li>
-      <li><a (click)="libraryService.saveLibrary()">Save library</a></li>
-      <li><a (click)="libraryService.reloadLibrary()">Reload library</a></li>
+      <li><a (click)="libraryService.parseComics(notificationsService)">Update comics</a></li>
+      <li><a (click)="libraryService.parseIssues(notificationsService)">Update issues</a></li>
+      <li><a (click)="libraryService.findExactMapping(notificationsService)">Update comics info with Comic Vine API</a></li>
+      <li><a (click)="libraryService.updateComicsInfos(notificationsService)">Update issues info with Comic Vine API</a></li>
+      <li><a (click)="libraryService.saveLibrary(notificationsService)">Save library</a></li>
+      <li><a (click)="libraryService.reloadLibrary(notificationsService)">Reload library</a></li>
     </ul>
   </div>
 </div>

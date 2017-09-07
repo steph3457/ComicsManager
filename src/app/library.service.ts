@@ -5,6 +5,8 @@ import { Comic } from "../lib/Comic";
 import { Issue } from "../lib/Issue";
 import { Config } from "../lib/Config";
 import { Filter } from "../lib/Filter";
+import { NotificationsService } from "angular2-notifications";
+
 
 @Injectable()
 export class LibraryService {
@@ -46,7 +48,8 @@ export class LibraryService {
       this.count_of_read_issues += comic.count_of_read_issues;
     }
   }
-  parseComics() {
+  parseComics(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Parsing comics", "pending...");
     this.http.get('/parseComics').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -54,9 +57,12 @@ export class LibraryService {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Parsing issues", "complete", {timeOut:2000});
     });
   }
-  parseIssues() {
+  parseIssues(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Parsing issues", "pending...");
     this.http.get('/parseIssues').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -64,9 +70,12 @@ export class LibraryService {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Parsing issues", "complete", {timeOut:2000});
     });
   }
-  saveLibrary() {
+  saveLibrary(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Save library", "pending...");    
     this.http.get('/saveLibrary').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -74,9 +83,12 @@ export class LibraryService {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Save library", "complete", {timeOut:2000});
     });
   }
-  reloadLibrary() {
+  reloadLibrary(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Reload library", "pending...");        
     this.http.get('/reloadLibrary').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -84,6 +96,8 @@ export class LibraryService {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Reload library", "complete", {timeOut:2000});
     });
   }
   saveConfig() {
@@ -115,7 +129,8 @@ export class LibraryService {
       this.updateCount();
     });
   }
-  findExactMapping() {
+  findExactMapping(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Search comics infos", "pending...");        
     this.http.get('/findExactMapping').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -123,9 +138,12 @@ export class LibraryService {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Search comics infos", "complete", {timeOut:2000});
     });
   }
-  updateComicsInfos() {
+  updateComicsInfos(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Update comics infos", "pending...");        
     this.http.get('/updateLibraryInfos').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -133,6 +151,8 @@ export class LibraryService {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
       this.updateCount();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Update comics infos", "complete", {timeOut:2000});
     });
   }
   updateComicInfos() {
