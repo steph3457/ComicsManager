@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "version": "0.9.0",
+    "short_name": "ComicsManager",
+    "name": "Comics Manager",
+    "icons": {
+        "32": "src/assets/touch-icon-32.png",
+        "76": "src/assets/touch-icon-76.png",
+        "120": "src/assets/touch-icon-120.png",
+        "152": "src/assets/touch-icon-152.png"
+    },
+    "app": {
+        "urls": ["http://stephanegosselin.myqnapcloud.com:3000/library"],
+        "launch": {
+            "web_url": "http://stephanegosselin.myqnapcloud.com:3000/library"
+        }
+    },
+    "permissions": ["unlimitedStorage", "notifications"]
+}
