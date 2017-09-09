@@ -58,7 +58,7 @@ export class LibraryService {
       }
       this.updateCount();
       notificationsService.remove(notif.id);
-      notificationsService.success("Parsing issues", "complete", {timeOut:2000});
+      notificationsService.success("Parsing comics", "complete", { timeOut: 2000 });
     });
   }
   parseIssues(notificationsService: NotificationsService) {
@@ -71,11 +71,11 @@ export class LibraryService {
       }
       this.updateCount();
       notificationsService.remove(notif.id);
-      notificationsService.success("Parsing issues", "complete", {timeOut:2000});
+      notificationsService.success("Parsing issues", "complete", { timeOut: 2000 });
     });
   }
   saveLibrary(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Save library", "pending...");    
+    let notif = notificationsService.info("Save library", "pending...");
     this.http.get('/saveLibrary').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -84,11 +84,11 @@ export class LibraryService {
       }
       this.updateCount();
       notificationsService.remove(notif.id);
-      notificationsService.success("Save library", "complete", {timeOut:2000});
+      notificationsService.success("Save library", "complete", { timeOut: 2000 });
     });
   }
   reloadLibrary(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Reload library", "pending...");        
+    let notif = notificationsService.info("Reload library", "pending...");
     this.http.get('/reloadLibrary').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -97,12 +97,14 @@ export class LibraryService {
       }
       this.updateCount();
       notificationsService.remove(notif.id);
-      notificationsService.success("Reload library", "complete", {timeOut:2000});
+      notificationsService.success("Reload library", "complete", { timeOut: 2000 });
     });
   }
-  saveConfig() {
+  saveConfig(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Save config", "pending...");
     this.http.post('/saveConfig', this.config).subscribe(res => {
-      this.config = res.json();
+      notificationsService.remove(notif.id);
+      notificationsService.success("Save config", "complete", { timeOut: 2000 });
     });
   }
   displayComic(comic) {
@@ -130,7 +132,7 @@ export class LibraryService {
     });
   }
   findExactMapping(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Search comics infos", "pending...");        
+    let notif = notificationsService.info("Search comics infos", "pending...");
     this.http.get('/findExactMapping').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -139,11 +141,11 @@ export class LibraryService {
       }
       this.updateCount();
       notificationsService.remove(notif.id);
-      notificationsService.success("Search comics infos", "complete", {timeOut:2000});
+      notificationsService.success("Search comics infos", "complete", { timeOut: 2000 });
     });
   }
   updateComicsInfos(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Update comics infos", "pending...");        
+    let notif = notificationsService.info("Update comics infos", "pending...");
     this.http.get('/updateLibraryInfos').subscribe(res => {
       var jsonRes = res.json();
       this.comics = {};
@@ -152,7 +154,7 @@ export class LibraryService {
       }
       this.updateCount();
       notificationsService.remove(notif.id);
-      notificationsService.success("Update comics infos", "complete", {timeOut:2000});
+      notificationsService.success("Update comics infos", "complete", { timeOut: 2000 });
     });
   }
   updateComicInfos() {
