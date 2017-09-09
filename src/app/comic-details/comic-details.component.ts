@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LibraryService } from '../library.service';
 import { Comic } from "../../lib/Comic";
 import { Issue } from "../../lib/Issue";
+import { NotificationsService } from "angular2-notifications";
 
 @Component({
   selector: 'app-comic-details',
@@ -11,7 +12,7 @@ import { Issue } from "../../lib/Issue";
 export class ComicDetailsComponent implements OnInit {
 
   edit: boolean = false;
-  constructor(public libraryService: LibraryService) { }
+  constructor(public libraryService: LibraryService, public notificationsService: NotificationsService) { }
 
   editMode() {
     this.edit = !this.edit;
