@@ -38,7 +38,7 @@
      inkscape:window-x="5"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg3804" />
+     inkscape:current-layer="layer4" />
   <metadata
      id="metadata3810">
     <rdf:RDF>
@@ -53,6 +53,19 @@
   </metadata>
   <defs
      id="defs3808" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer4"
+     inkscape:label="fond"
+     style="display:inline">
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1"
+       id="rect6908"
+       width="885.40167"
+       height="835.54791"
+       x="93.724945"
+       y="96.259392" />
+  </g>
   <g
      style="display:none;opacity:1"
      inkscape:label="contours"
@@ -165,7 +178,7 @@
        style="opacity:1;fill:#2a6395;fill-opacity:1;stroke-width:1.99414778" />
   </g>
   <g
-     style="display:inline;opacity:0.81"
+     style="display:inline;opacity:0.81000001"
      inkscape:label="interieur"
      id="layer1"
      inkscape:groupmode="layer">
