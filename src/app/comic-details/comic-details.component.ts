@@ -21,7 +21,7 @@ export class ComicDetailsComponent implements OnInit {
       comicVineIdInput.focus();
     }
     else {
-      this.libraryService.updateComicVineId();
+      this.libraryService.updateComicVineId(this.notificationsService);
     }
   }
 

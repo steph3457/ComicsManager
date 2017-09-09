@@ -166,11 +166,14 @@ export class LibraryService {
       notificationsService.success("Update comic infos", "complete", { timeOut: 2000 });
     });
   }
-  updateComicVineId() {
+  updateComicVineId(notificationsService: NotificationsService) {
+    let notif = notificationsService.info("Update comic infos", "pending...");
     if (this.comic.comicVineId) {
       this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
         this.comic = new Comic(res.json());
         this.updateCount();
+        notificationsService.remove(notif.id);
+        notificationsService.success("Update comic infos", "complete", { timeOut: 2000 });
       });
     }
   }
