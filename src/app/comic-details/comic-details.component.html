@@ -36,7 +36,7 @@
     </table>
   </div>
   <button (click)="libraryService.markRead(null)">Mark all read</button>
-  <button (click)="libraryService.updateComicInfos()">Update Infos</button>
+  <button (click)="libraryService.updateComicInfos(notificationsService)">Update Infos</button>
 </div>
 
 <div class="loading" [hidden]="!libraryService.loading">

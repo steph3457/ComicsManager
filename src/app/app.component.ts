@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { LibraryService } from './library.service';
+import { NotificationsService } from "angular2-notifications";
 
 @Component({
   selector: 'app-root',
@@ -8,7 +9,11 @@ import { LibraryService } from './library.service';
 })
 export class AppComponent {
   public isCollapsed: boolean = true;
-  constructor(private libraryService: LibraryService) {
+  public options = {
+    position: ["top", "right"],
+    lastOnBottom: false
+  };
+  constructor(private libraryService: LibraryService, public notificationsService: NotificationsService) {
   }
   public get menuIcon(): string {
     return this.isCollapsed ? '☰' : '✖';
