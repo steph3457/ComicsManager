@@ -1,0 +1,58 @@
+{
+    "manifest_version": 2,
+    "version": "0.9.0",
+    "short_name": "ComicsMana",
+    "name": "Comics Manager",
+    "start_url": "./",
+    "orientation": "portrait",
+    "display": "fullscreen",
+    "background_color": "#eaeaea",
+    "theme_color": "#eaeaea",
+    "icons": [
+        {
+            "src": "/assets/favicon32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon76.png",
+            "sizes": "76x76",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon120.png",
+            "sizes": "120x120",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon152.png",
+            "sizes": "152x152",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon180.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon196.png",
+            "sizes": "196x196",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon228.png",
+            "sizes": "228x228",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/favicon1200.png",
+            "sizes": "1200x1200",
+            "type": "image/png"
+        }
+    ]
+}

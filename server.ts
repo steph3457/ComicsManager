@@ -3,7 +3,7 @@ import path = require('path');
 import logger = require('morgan');
 import cookieParser = require('cookie-parser');
 import bodyParser = require('body-parser');
-
+import compression = require('compression');
 import { ComicsLibrary } from "./src/lib/ComicsLibrary";
 
 var app = express();
@@ -13,6 +13,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(compression());
 app.use(express.static(__dirname));
 
 app.get('/', function (req, res) {
