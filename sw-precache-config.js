@@ -18,8 +18,8 @@ module.exports = {
             handler: "networkFirst"
         },
         {
-            urlPattern: /https:\/\/maxcdn.bootstrapcdn.com\/.*.css/,
-            handler: "networkFirst"
+            urlPattern: /https:\/\/comicvine.gamespot.com\/.*/,
+            handler: "fastest"
         }
     ]
 };
