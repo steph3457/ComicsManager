@@ -103,6 +103,10 @@ app.get('/image/:comic/:issue/:image', function (req, res) {
     res.sendFile(image);
 });
 
+app.listen(3001, function () {
+    console.log('Example app listening on port 3001!');
+});
+
 var server = https.createServer(https_options, app).listen(3000, "0.0.0.0");
 console.log('HTTPS Server listening on %s:%s', "localhost", 3000);
 

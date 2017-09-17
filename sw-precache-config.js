@@ -18,12 +18,16 @@ module.exports = {
             handler: "networkFirst"
         },
         {
+            urlPattern: "/read",
+            handler: "cacheFirst"
+        },
+        {
             urlPattern: /https:\/\/comicvine.gamespot.com\/.*/,
             handler: "fastest"
         },
         {
             urlPattern: /.*\/image\/.*/,
-            handler: "fastest"
+            handler: "cacheFirst"
         }
     ]
 };
