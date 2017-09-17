@@ -181,8 +181,8 @@ export class LibraryService {
     if (issue.possessed) {
       this.loading = true;
       this.fullScreen(true);
-      var body: any = { comic: this.comic.folder_name, issue: issue.file_name };
-      this.http.post('/read', body).subscribe(res => {
+      let url= "/read/" + encodeURIComponent(issue.folder_name) + "/" + encodeURIComponent(issue.file_name);
+      this.http.get(url).subscribe(res => {
         this.issue = issue;
         this.images = res.json();
         this.issue.readingStatus.pageCount = this.images.length;

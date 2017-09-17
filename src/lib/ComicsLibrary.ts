@@ -132,9 +132,9 @@ export class ComicsLibrary {
         }
         async.each(this.comics, parseIssues, response.bind(this));
     }
-    read(req, res) {
-        if (req.comic && this.comics[req.comic] && req.issue) {
-            this.comics[req.comic].read(req.issue, this.config, res);
+    read(comic, issue, res) {
+        if (comic && this.comics[comic] && issue) {
+            this.comics[comic].read(issue, this.config, res);
         }
     }
     markRead(issue: IssueServer) {

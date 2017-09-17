@@ -94,8 +94,8 @@ app.post('/markRead', function (req, res) {
     comicsLibrary.markRead(req.body);
     res.json(comicsLibrary.comics[req.body.folder_name]);
 });
-app.post('/read', function (req, res) {
-    comicsLibrary.read(req.body, res);
+app.get('/read/:comic/:issue', function (req, res) {
+    comicsLibrary.read(req.params.comic, req.params.issue, res);
 });
 app.get('/image/:comic/:issue/:image', function (req, res) {
     var image = path.resolve("./temp", req.params.comic, req.params.issue, req.params.image);

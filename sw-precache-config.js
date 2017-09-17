@@ -18,7 +18,7 @@ module.exports = {
             handler: "networkFirst"
         },
         {
-            urlPattern: "/read",
+            urlPattern: /.*\/read\/.*/,
             handler: "cacheFirst"
         },
         {
