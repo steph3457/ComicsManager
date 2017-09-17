@@ -64,3 +64,4 @@ config.json
 comicsLibrary.json
 
 .DS_Store
+*.pem

@@ -20,6 +20,10 @@ module.exports = {
         {
             urlPattern: /https:\/\/comicvine.gamespot.com\/.*/,
             handler: "fastest"
+        },
+        {
+            urlPattern: /.*\/image\/.*/,
+            handler: "fastest"
         }
     ]
 };
