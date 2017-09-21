@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  comics:
+    image: comicsmanager:latest
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    volumes:
+      - ./comics:/comics
+      - ./:/web
+    labels:
+      - traefik.backend=comics
+      - traefik.frontend.rule=Host:comics.my.domain.com
+      - traefik.docker.network=proxy
+      - traefik.port=3001
+    networks:
+      - internal
+      - proxy
+networks:
+  proxy:
+    external: true
+  internal:
+    external: false
