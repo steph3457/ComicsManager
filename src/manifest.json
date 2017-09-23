@@ -1,11 +1,11 @@
 {
     "manifest_version": 2,
-    "version": "0.9.0",
-    "short_name": "ComicsMana",
+    "version": "1.0.0",
+    "short_name": "Comics",
     "name": "Comics Manager",
-    "start_url": "./",
+    "start_url": "/",
     "orientation": "portrait",
-    "display": "fullscreen",
+    "display": "standalone",
     "background_color": "#eaeaea",
     "theme_color": "#eaeaea",
     "icons": [
