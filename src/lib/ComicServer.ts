@@ -131,7 +131,7 @@ export class ComicServer extends Comic {
             console.log("Mapping already exist for " + this.folder_name);
             return;
         }
-        var page = 0;
+        let page = 0;
         var url =
             "http://comicvine.gamespot.com/api/search/?api_key=" +
             config.comicVineAPI +
@@ -158,7 +158,8 @@ export class ComicServer extends Comic {
                 var body = JSON.parse(body);
                 var found = false;
                 var nextPage = false;
-                if (body.number_of_total_results > body.page * body.limit) {
+                page++;
+                if (body.number_of_total_results > page * body.limit) {
                     nextPage = true;
                 }
                 var results = body.results;
@@ -184,7 +185,6 @@ export class ComicServer extends Comic {
                     }
                 }
                 if (!found && nextPage) {
-                    page++;
                     var url =
                         "http://comicvine.gamespot.com/api/search/?api_key=" +
                         config.comicVineAPI +
@@ -220,7 +220,7 @@ export class ComicServer extends Comic {
         if (!this.comicVineId) {
             console.log(
                 "unable to find extra information in comic vine for " +
-                    this.folder_name
+                this.folder_name
             );
             callback();
             return;
@@ -309,3 +309,4 @@ export class ComicServer extends Comic {
         this.updateCount();
     }
 }
+                                
