@@ -1,21 +1,92 @@
-import { Comic } from "./Comic";
-import * as request from "request";
-import { Config } from "./Config";
-import { IssueServer } from "./IssueServer";
-import { Publisher } from "./Publisher";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
 import * as path from "path";
+import { Config } from "../lib/Config";
+import * as request from "request";
+import { Publisher } from "./Publisher";
+import { Issue } from "./Issue";
 
-export class ComicServer extends Comic {
-    issues: { [name: string]: IssueServer } = {};
-    constructor(comic: ComicServer) {
-        super(comic);
+@Entity()
+export class Comic {
+    @PrimaryGeneratedColumn()
+    id: number;
+    @Column({ default: "", unique: true })
+    folder_name: string = "";
+    @Column({ default: "" })
+    title: string = "";
+    @Column({ default: "" })
+    year: string = "";
+    @Column({ default: "" })
+    image: string = "";
+    @Column({ default: "" })
+    comicVineId: number;
+    @Column({ default: 0 })
+    count_of_issues: number = 0;
+    @Column({ default: 0 })
+    count_of_possessed_issues: number = 0;
+    @Column({ default: 0 })
+    count_of_read_issues: number = 0;
+    @Column({ default: "" })
+    description: string = "";
+    @Column({ default: "" })
+    api_detail_url: string = "";
+    @Column({ default: "" })
+    site_detail_url: string = "";
+
+    @ManyToOne(type => Publisher, publisher => publisher.comics, {
+        nullable: true,
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: false
+    })
+    publisher: Publisher;
+    @OneToMany(type => Issue, issue => issue.comic, {
+        cascadeInsert: true,
+        cascadeUpdate: true
+    })
+    issues: Issue[] = [];
+    @Column({ default: false })
+    finished: boolean = false;
+
+
+    constructor(comic: Comic) {
         if (comic) {
+            this.folder_name = comic.folder_name;
+            this.title = comic.title;
+            this.year = comic.year;
+            this.image = comic.image;
+            this.comicVineId = comic.comicVineId;
+            this.count_of_issues = comic.count_of_issues;
+            this.count_of_possessed_issues = comic.count_of_possessed_issues;
+            this.count_of_read_issues = comic.count_of_possessed_issues;
+            this.description = comic.description;
+            this.api_detail_url = comic.api_detail_url;
+            this.site_detail_url = comic.site_detail_url;
+            this.publisher = new Publisher(comic.publisher);
+            this.finished = comic.finished;
             for (const issue in comic.issues) {
-                this.issues[issue] = new IssueServer(comic.issues[issue]);
+                this.issues.push(new Issue(comic.issues[issue]));
             }
         }
     }
 
+    updateCount() {
+        let possessed = 0;
+        let read = 0;
+        for (const issue in this.issues) {
+            if (!this.issues[issue].annual) {
+                if (this.issues[issue].readingStatus.read) {
+                    read++;
+                }
+                if (this.issues[issue].possessed) {
+                    possessed++;
+                }
+            }
+        }
+        this.count_of_possessed_issues = possessed;
+        this.count_of_read_issues = read;
+    }
+
+    //Server part
     update(comicVineJson) {
         this.count_of_issues = comicVineJson.issues
             ? comicVineJson.issues.length
@@ -34,7 +105,7 @@ export class ComicServer extends Comic {
     updateIssueInformation(comicVineJson) {
         const issueNumber: number = parseFloat(comicVineJson.issue_number);
         let found = false;
-        let issue: IssueServer;
+        let issue: Issue;
         for (const i in this.issues) {
             if (
                 this.issues[i].number === issueNumber &&
@@ -45,7 +116,7 @@ export class ComicServer extends Comic {
             }
         }
         if (!found) {
-            issue = new IssueServer(null);
+            issue = new Issue(null);
             this.issues[issueNumber] = issue;
         }
         issue.updateFromComicVine(comicVineJson);
@@ -80,7 +151,7 @@ export class ComicServer extends Comic {
         let issue = this.issues[issueName];
         if (!issue) {
             console.log("New Issue: " + issueName);
-            issue = new IssueServer(null);
+            issue = new Issue(null);
             issue.folder_name = this.folder_name;
             issue.file_name = issueName;
             issue.possessed = true;
@@ -106,7 +177,7 @@ export class ComicServer extends Comic {
         }
 
         if (this.issues[issue.number]) {
-            issue = new IssueServer(this.issues[issue.number]);
+            issue = new Issue(this.issues[issue.number]);
             delete this.issues[issue.number];
             issue.folder_name = this.folder_name;
             issue.file_name = issueName;
@@ -302,11 +373,10 @@ export class ComicServer extends Comic {
         }
         this.updateCount();
     }
-    updateReadingStatus(issue: IssueServer) {
+    updateReadingStatus(issue: Issue) {
         if (issue.file_name && this.issues[issue.file_name]) {
             this.issues[issue.file_name].readingStatus = issue.readingStatus;
         }
         this.updateCount();
     }
 }
-                                

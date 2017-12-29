@@ -2,6 +2,7 @@ import { Issue } from "./Issue";
 import { Publisher } from "./Publisher";
 
 export class Comic {
+    id: number;
     folder_name: string = "";
     title: string = "";
     year: string = "";
@@ -38,6 +39,7 @@ export class Comic {
     }
     constructor(comic: Comic) {
         if (comic) {
+            this.id = comic.id;
             this.folder_name = comic.folder_name;
             this.title = comic.title;
             this.year = comic.year;

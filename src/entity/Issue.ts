@@ -1,15 +1,69 @@
-import { Issue } from './Issue';
-import { Config } from './Config';
-import * as path from 'path';
+import { ReadingStatus } from "../lib/ReadingStatus";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Comic } from "./Comic";
+import * as path from "path";
+import { Config } from "../lib/Config";
 import * as Unrar from 'node-unrar';
-import { ReadingStatus } from './ReadingStatus';
 import { unzip } from 'cross-unzip';
 
-export class IssueServer extends Issue {
-  constructor(issue: IssueServer) {
-    super(issue);
+@Entity()
+export class Issue {
+  @PrimaryGeneratedColumn()
+  id: number;
+  @ManyToOne(type => Comic, comic => comic.issues, {
+    cascadeInsert: true,
+    cascadeUpdate: true,
+    cascadeRemove: false
+  })
+  comic: Comic;
+  @Column({ default: "" })
+  folder_name: string = "";
+  @Column({ default: "" })
+  file_name: string = "";
+  @Column({ default: "" })
+  title: string = "";
+  @Column({ default: "" })
+  year: string = "";
+  @Column({ default: "" })
+  image: string = "";
+  @Column({ default: 0 })
+  comicVineId: number;
+  @Column({ default: 0 })
+  number: number;
+  readingStatus: ReadingStatus;
+  @Column({ default: false })
+  possessed: boolean = false;
+  @Column({ default: "" })
+  api_detail_url: string = "";
+  @Column({ default: "" })
+  site_detail_url: string = "";
+  @Column({ default: false })
+  annual: boolean = false;
+  @Column({ type: "date", nullable: true })
+  date: Date;
+  constructor(issue: Issue) {
+    if (issue) {
+      if (issue.folder_name)
+        this.folder_name = issue.folder_name;
+      if (issue.file_name)
+        this.file_name = issue.file_name;
+      this.title = issue.title;
+      this.year = issue.year;
+      this.image = issue.image;
+      this.comicVineId = issue.comicVineId;
+      this.number = issue.number;
+      this.possessed = issue.possessed;
+      this.api_detail_url = issue.api_detail_url;
+      this.site_detail_url = issue.site_detail_url;
+      this.annual = issue.annual;
+      this.readingStatus = new ReadingStatus(issue.readingStatus);
+      this.date = new Date(issue.date);
+    }
+    else {
+      this.readingStatus = new ReadingStatus(null);
+      this.date = new Date();
+    }
   }
-
   updateFromComicVine(comicVineJson) {
     this.title = comicVineJson.name;
     this.api_detail_url = comicVineJson.api_detail_url;
@@ -18,7 +72,6 @@ export class IssueServer extends Issue {
     this.number = parseFloat(comicVineJson.issue_number);
     this.image = comicVineJson.image.thumb_url;
     this.date = new Date(comicVineJson.store_date);
-    //this.description= comicVineJson.description;
   }
 
   readFile(config: Config, res) {
