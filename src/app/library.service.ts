@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Router } from '@angular/router';
-import { Comic } from "../lib/Comic";
-import { Issue } from "../lib/Issue";
 import { Config } from "../lib/Config";
 import { Filter } from "../lib/Filter";
 import { NotificationsService } from "angular2-notifications";
+import { Comic } from '../lib/Comic';
+import { Issue } from '../lib/Issue';
 
 
 @Injectable()
@@ -181,7 +181,7 @@ export class LibraryService {
     if (issue.possessed) {
       this.loading = true;
       this.fullScreen(true);
-      let url= "/read/" + encodeURIComponent(issue.folder_name) + "/" + encodeURIComponent(issue.file_name);
+      let url = "/read/" + encodeURIComponent(issue.folder_name) + "/" + encodeURIComponent(issue.file_name);
       this.http.get(url).subscribe(res => {
         this.issue = issue;
         this.images = res.json();

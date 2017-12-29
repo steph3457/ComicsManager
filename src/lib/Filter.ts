@@ -1,7 +1,8 @@
 import { Comic } from "./Comic";
+
 export class Filter {
     search: string = "";
-    restriction: string= null;
+    restriction: string = null;
     constructor() { }
 
     public match(comic: Comic): boolean {

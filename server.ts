@@ -1,22 +1,15 @@
-import express = require('express');
-import path = require('path');
-import logger = require('morgan');
-import cookieParser = require('cookie-parser');
-import bodyParser = require('body-parser');
-import compression = require('compression');
+import "reflect-metadata";
+import * as express from 'express';
+import * as path from "path";
+import * as logger from 'morgan';
+import * as cookieParser from 'cookie-parser';
+import * as  bodyParser from 'body-parser';
+import * as compression from 'compression';
 import { ComicsLibrary } from "./src/lib/ComicsLibrary";
-import fs = require('fs');
-import https = require('https');
-
-var key = fs.readFileSync('./key.pem');
-var cert = fs.readFileSync('./cert.pem')
-var https_options = {
-    key: key,
-    cert: cert
-};
+import * as fs from 'fs';
 
 var app = express();
-var comicsLibrary = new ComicsLibrary();
+var comicsLibrary = new ComicsLibrary(false);
 var bodyParser = require('body-parser');
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -106,10 +99,6 @@ app.get('/image/:comic/:issue/:image', function (req, res) {
 app.listen(3001, function () {
     console.log('Example app listening on port 3001!');
 });
-
-var server = https.createServer(https_options, app).listen(3000, "0.0.0.0");
-console.log('HTTPS Server listening on %s:%s', "localhost", 3000);
-
 
 var schedule = require('node-schedule');
 schedule.scheduleJob('0 7 * * 3', function () {

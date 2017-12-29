@@ -65,3 +65,5 @@ comicsLibrary.json
 
 .DS_Store
 *.pem
+
+database.db

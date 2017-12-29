@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { LibraryService } from '../library.service';
-import { Comic } from "../../lib/Comic";
-import { Issue } from "../../lib/Issue";
 import { NotificationsService } from "angular2-notifications";
 
 @Component({
