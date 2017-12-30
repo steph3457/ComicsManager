@@ -96,6 +96,10 @@ app.get('/image/:comic/:issue/:image', function (req, res) {
     res.sendFile(image);
 });
 
+app.get('/api/comic/:id', function (req, res) {
+    comicsLibrary.getComic(res, +req.params.id);
+});
+
 app.listen(3001, function () {
     console.log('Example app listening on port 3001!');
 });

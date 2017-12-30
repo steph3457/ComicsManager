@@ -19,6 +19,8 @@ import { ConfigComponent } from "./config/config.component";
 import { SimpleNotificationsModule } from "angular2-notifications";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+
 @NgModule({
     declarations: [
         AppComponent,
@@ -36,7 +38,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         SimpleNotificationsModule.forRoot(),
         ButtonsModule.forRoot()
     ],
-    providers: [LibraryService],
+    providers: [LibraryService,
+        { provide: LocationStrategy, useClass: HashLocationStrategy }],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -3,7 +3,8 @@ import * as async from 'async';
 import { Issue } from '../entity/Issue';
 import { Config } from './Config';
 import { Comic } from '../entity/Comic';
-import { createConnection } from "typeorm";
+import { createConnection, ConnectionOptions, Connection } from "typeorm";
+import { Publisher } from '../entity/Publisher';
 
 export class ComicsLibrary {
     private jsonfile = require('jsonfile');
@@ -11,6 +12,8 @@ export class ComicsLibrary {
     private configFileName = 'config.json';
     comics: Comic[] = [];
     config: Config;
+    private connection: Connection;
+
     constructor(fromJson: boolean) {
         this.config = new Config(this.jsonfile.readFileSync(this.configFileName, { throws: false }));
         if (fromJson) {
@@ -19,12 +22,10 @@ export class ComicsLibrary {
             this.loadLibrary();
         }
     }
-    loadLibrary() {
-        createConnection().then(async connection => {
-            let comicRepository = connection.getRepository(Comic);
-            this.comics = await comicRepository.find({ relations: ["issues", "publisher"] });
-        }
-        ).catch(error => console.log(error));
+    async loadLibrary() {
+        this.connection = await createConnection();
+        let comicRepository = this.connection.getRepository(Comic);
+        this.comics = await comicRepository.find({ relations: ["publisher"] });
     }
     loadLibraryFromJson() {
         this.comics = [];
@@ -166,5 +167,11 @@ export class ComicsLibrary {
             this.comics[issue.folder_name].updateReadingStatus(issue);
         }
         this.saveLibrary();
+    }
+
+    async getComic(res, id: number) {
+        let comicRepository = this.connection.getRepository(Comic);
+        let comic: Comic = await comicRepository.findOneById(id, { relations: ["issues", "publisher"] });
+        res.json(comic);
     }
 }

@@ -107,9 +107,8 @@ export class LibraryService {
       notificationsService.success("Save config", "complete", { timeOut: 2000 });
     });
   }
-  displayComic(comic) {
-    this.comic = comic;
-    this.router.navigate(['/comic']);
+  displayComic(comic: Comic) {
+    this.router.navigate(['/comic', comic.id]);
     window.scrollTo(0, 0);
   }
   backToComic() {
@@ -118,7 +117,7 @@ export class LibraryService {
       this.updateCount();
     });
     this.fullScreen(false);
-    this.router.navigate(['/comic']);
+    this.router.navigate(['/comic', this.comics.id]);
     window.scrollTo(0, 0);
   }
   markRead(issue: Issue) {
@@ -186,7 +185,7 @@ export class LibraryService {
         this.issue = issue;
         this.images = res.json();
         this.issue.readingStatus.pageCount = this.images.length;
-        this.router.navigate(['/reader']);
+        this.router.navigate(['/reader', this.issue.id]);
         this.loading = false;
         window.scrollTo(0, 0);
       });
