@@ -117,8 +117,6 @@ export class LibraryService {
       this.updateCount();
     });
     this.fullScreen(false);
-    this.router.navigate(['/comic', this.comics.id]);
-    window.scrollTo(0, 0);
   }
   markRead(issue: Issue) {
     var body: any = { folder_name: this.comic.folder_name };
@@ -180,7 +178,7 @@ export class LibraryService {
     if (issue.possessed) {
       this.loading = true;
       this.fullScreen(true);
-      let url = "/read/" + encodeURIComponent(issue.folder_name) + "/" + encodeURIComponent(issue.file_name);
+      let url = "/api/read/" + issue.id;
       this.http.get(url).subscribe(res => {
         this.issue = issue;
         this.images = res.json();

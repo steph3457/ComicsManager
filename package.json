@@ -7,7 +7,7 @@
     "build": "./build.sh",
     "install": "./install.sh",
     "sw": "sw-precache --root=dist --config=sw-precache-config.js",
-    "migrateToSqlite": "ts-node src/migrateJson.ts"
+    "migrateToSqlite": "node dist/src/migrateJson.js"
   },
   "private": true,
   "dependencies": {

@@ -146,11 +146,7 @@ export class ComicsLibrary {
         }
         async.each(this.comics, parseIssues, response.bind(this));
     }
-    read(comic, issue, res) {
-        if (comic && this.comics[comic] && issue) {
-            this.comics[comic].read(issue, this.config, res);
-        }
-    }
+
     markRead(issue: Issue) {
         if (issue.folder_name && this.comics[issue.folder_name]) {
             if (issue.file_name) {
@@ -169,9 +165,17 @@ export class ComicsLibrary {
         this.saveLibrary();
     }
 
-    async getComic(res, id: number) {
+    async getComic(res, comicId: number) {
         let comicRepository = this.connection.getRepository(Comic);
-        let comic: Comic = await comicRepository.findOneById(id, { relations: ["issues", "publisher"] });
+        let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
         res.json(comic);
+    }
+
+    async read(res, issueId: number) {
+        let issueRepository = this.connection.getRepository(Issue);
+        let issue: Issue = await issueRepository.findOneById(issueId);
+        if (issue) {
+            issue.readFile(this.config, res);
+        }
     }
 }

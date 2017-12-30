@@ -1,5 +1,5 @@
-import { ReadingStatus } from "../lib/ReadingStatus";
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { ReadingStatus } from "./ReadingStatus";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, JoinColumn } from "typeorm";
 import { Comic } from "./Comic";
 import * as path from "path";
 import { Config } from "../lib/Config";
@@ -30,6 +30,12 @@ export class Issue {
   comicVineId: number;
   @Column({ default: 0 })
   number: number;
+  @OneToOne(type => ReadingStatus, readingStatus => readingStatus.issue, {
+    cascadeInsert: true,
+    cascadeUpdate: true,
+    cascadeRemove: true
+  })
+  @JoinColumn()
   readingStatus: ReadingStatus;
   @Column({ default: false })
   possessed: boolean = false;

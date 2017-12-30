@@ -356,11 +356,6 @@ export class Comic {
         request(options, requestCallback.bind(this));
     }
 
-    read(issueName: string, config: Config, res) {
-        if (this.issues[issueName]) {
-            return this.issues[issueName].readFile(config, res);
-        }
-    }
     markIssueRead(issueName: string) {
         if (this.issues[issueName]) {
             this.issues[issueName].markRead(false);
