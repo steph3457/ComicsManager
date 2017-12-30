@@ -87,17 +87,16 @@ app.post('/markRead', function (req, res) {
     comicsLibrary.markRead(req.body);
     res.json(comicsLibrary.comics[req.body.folder_name]);
 });
-app.get('/image/:comic/:issue/:image', function (req, res) {
-    var image = path.resolve("./temp", req.params.comic, req.params.issue, req.params.image);
-    console.log("image requested: " + image);
-    res.sendFile(image);
-});
 
 app.get('/api/comic/:comic', function (req, res) {
     comicsLibrary.getComic(res, +req.params.comic);
 });
 app.get('/api/read/:issue', function (req, res) {
     comicsLibrary.read(res, req.params.issue);
+});
+app.get('/api/image/:issue/:image', function (req, res) {
+    var image = path.resolve("./temp", req.params.issue, req.params.image);
+    res.sendFile(image);
 });
 
 app.listen(3001, function () {

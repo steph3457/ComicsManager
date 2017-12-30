@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { LibraryService } from '../library.service';
 import { NotificationsService } from "angular2-notifications";
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Comic } from '../../lib/Comic';
 import { Http } from '@angular/http';
+import { Issue } from '../../lib/Issue';
 
 @Component({
   selector: 'app-comic-details',
@@ -18,7 +19,8 @@ export class ComicDetailsComponent implements OnInit {
     public libraryService: LibraryService,
     public notificationsService: NotificationsService,
     private route: ActivatedRoute,
-    private http: Http
+    private http: Http,
+    private router: Router
   ) { }
 
   editMode() {
@@ -29,6 +31,12 @@ export class ComicDetailsComponent implements OnInit {
     }
     else {
       this.libraryService.updateComicVineId(this.notificationsService);
+    }
+  }
+
+  read(issue: Issue) {
+    if (issue.possessed) {
+      this.router.navigate(['/reader', issue.id]);
     }
   }
 

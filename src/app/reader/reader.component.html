@@ -1,15 +1,19 @@
-<div (window:keydown)=libraryService.navigate($event.keyCode)>
+<div (window:keydown)=navigate($event.keyCode)>
   <ul>
     <li *ngFor="let image of images; let i = index">
-      <div class="image" [hidden]="!libraryService.isCurrentPage(i)">
-        <img [src]="libraryService.getImageUrl(image)" class="img-responsive">
+      <div class="image" [hidden]="!isCurrentPage(i)">
+        <img [src]="getImageUrl(image)" class="img-responsive">
       </div>
     </li>
   </ul>
 </div>
-<div class="previousPage" (click)="libraryService.previousPage()">
+<div class="previousPage" (click)="previousPage()">
 </div>
-<div class="nextPage" (click)="libraryService.nextPage()">
+<div class="nextPage" (click)="nextPage()">
 </div>
 <div class="back" (click)="backToComic()">
+</div>
+
+<div class="loading" [hidden]="!loading">
+  <img src="../assets/loading.gif" class="img-responsive">
 </div>

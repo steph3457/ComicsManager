@@ -30,7 +30,7 @@
           <img *ngIf="issue.image" src="{{issue.image}}" class="thumb img-responsive">
         </td>
         <td>{{issue.number}}</td>
-        <td class="clickable" (click)="libraryService.read(issue)">{{issue.file_name}}</td>
+        <td class="clickable" (click)="read(issue)">{{issue.file_name}}</td>
         <td>{{issue.title}}</td>
         <td>{{issue.date |date:'longDate'}}</td>
         <td class="clickable" (click)="libraryService.markRead(issue)">
@@ -41,8 +41,4 @@
   </div>
   <button (click)="libraryService.markRead(null)">Mark all read</button>
   <button (click)="libraryService.updateComicInfos(notificationsService)">Update Infos</button>
-</div>
-
-<div class="loading" [hidden]="!libraryService.loading">
-  <img src="../assets/loading.gif" class="img-responsive">
 </div>

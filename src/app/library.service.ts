@@ -18,7 +18,6 @@ export class LibraryService {
   images: string[];
   count_of_possessed_issues: number = 0;
   count_of_read_issues: number = 0;
-  loading: boolean = false;
   config: Config;
   comicsComparer: (c1: Comic, c2: Comic) => number = Comic.ComicTitleComparer;
   comicsReverse: boolean = false;
@@ -111,13 +110,7 @@ export class LibraryService {
     this.router.navigate(['/comic', comic.id]);
     window.scrollTo(0, 0);
   }
-  backToComic() {
-    this.http.post('/updateReadingStatus', this.issue).subscribe(res => {
-      this.comic = new Comic(res.json());
-      this.updateCount();
-    });
-    this.fullScreen(false);
-  }
+
   markRead(issue: Issue) {
     var body: any = { folder_name: this.comic.folder_name };
     if (issue) {
@@ -174,73 +167,7 @@ export class LibraryService {
       });
     }
   }
-  read(issue: Issue) {
-    if (issue.possessed) {
-      this.loading = true;
-      this.fullScreen(true);
-      let url = "/api/read/" + issue.id;
-      this.http.get(url).subscribe(res => {
-        this.issue = issue;
-        this.images = res.json();
-        this.issue.readingStatus.pageCount = this.images.length;
-        this.router.navigate(['/reader', this.issue.id]);
-        this.loading = false;
-        window.scrollTo(0, 0);
-      });
-    }
-  }
-  getImageUrl(image: string): string {
-    if (this.issue && image) {
-      return "/image/" + encodeURIComponent(this.issue.folder_name) + "/" + encodeURIComponent(this.issue.file_name) + "/" + encodeURIComponent(image);
-    }
-    return "";
-  }
-  isCurrentPage(index: number): boolean {
-    return index === this.issue.readingStatus.currentPage;
-  }
-  nextPage() {
-    if (this.issue.readingStatus.currentPage < this.issue.readingStatus.pageCount - 1)
-      this.issue.readingStatus.currentPage++;
-    else if (this.issue.readingStatus.currentPage === this.issue.readingStatus.pageCount - 1) {
-      this.issue.readingStatus.read = true;
-      this.backToComic();
-    }
-  }
-  previousPage() {
-    if (this.issue.readingStatus.currentPage > 0)
-      this.issue.readingStatus.currentPage--;
-  }
-  navigate(keyCode) {
-    switch (keyCode) {
-      case 32:
-      case 39:
-        this.nextPage();
-        break;
-      case 37:
-        this.previousPage()
-        break;
-      case 13:
-        this.backToComic();
-        break;
-      default:
-        console.log(keyCode);
-        break;
-    }
-  }
-  fullScreen(on: boolean) {
-    if (on) {
-      if (document.body.webkitRequestFullScreen)
-        document.body.webkitRequestFullScreen();
-      if (document.body.requestFullscreen)
-        document.body.requestFullscreen();
-    }
-    else {
-      if (document.webkitCancelFullScreen)
-        document.webkitCancelFullScreen();
-      if (document.exitFullscreen)
-        document.exitFullscreen();
-    }
-  }
+
   getPossessedCount(comic: Comic): number {
     return comic.count_of_possessed_issues;
   }

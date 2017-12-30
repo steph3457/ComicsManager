@@ -82,13 +82,9 @@ export class Issue {
 
   readFile(config: Config, res) {
     var issuePath = path.resolve(config.comicsPath, this.folder_name, this.file_name);
-    var tempPath = path.resolve('./temp', this.folder_name, this.file_name);
-    var tempComicPath = path.resolve('./temp', this.folder_name);
+    var tempPath = path.resolve('./temp', "" + this.id);
     const fs = require('fs');
 
-    if (!fs.existsSync(tempComicPath)) {
-      fs.mkdirSync(tempComicPath);
-    }
     if (!fs.existsSync(tempPath)) {
       fs.mkdirSync(tempPath);
       unzip(issuePath, tempPath, err => {
@@ -111,7 +107,7 @@ export class Issue {
   sendImages(res) {
     const fs = require('fs');
     var imageList: string[] = [];
-    var tempPath = path.resolve("./temp", this.folder_name, this.file_name);
+    var tempPath = path.resolve("./temp", "" + this.id);
     imageList = fs.readdirSync(tempPath);
     if (imageList.length === 1) {
       var extraFolder = imageList[0];
