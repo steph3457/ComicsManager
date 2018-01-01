@@ -21,7 +21,7 @@ export class LibraryService {
   readingStatus: ReadingStatus = new ReadingStatus(null);
 
   constructor(private http: Http, private router: Router) {
-    this.http.get('/getLibrary').subscribe(res => {
+    this.http.get('/api/comics').subscribe(res => {
       var jsonRes = res.json();
       for (var comic in jsonRes) {
         this.comics[comic] = new Comic(jsonRes[comic]);
@@ -63,32 +63,6 @@ export class LibraryService {
       this.updateCount();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing issues", "complete", { timeOut: 2000 });
-    });
-  }
-  saveLibrary(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Save library", "pending...");
-    this.http.get('/saveLibrary').subscribe(res => {
-      var jsonRes = res.json();
-      this.comics = {};
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
-      this.updateCount();
-      notificationsService.remove(notif.id);
-      notificationsService.success("Save library", "complete", { timeOut: 2000 });
-    });
-  }
-  reloadLibrary(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Reload library", "pending...");
-    this.http.get('/reloadLibrary').subscribe(res => {
-      var jsonRes = res.json();
-      this.comics = {};
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
-      this.updateCount();
-      notificationsService.remove(notif.id);
-      notificationsService.success("Reload library", "complete", { timeOut: 2000 });
     });
   }
   saveConfig(notificationsService: NotificationsService) {

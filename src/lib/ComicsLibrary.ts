@@ -11,6 +11,7 @@ export class ComicsLibrary {
     private jsonfile = require('jsonfile');
     private comicsLibraryFileName = 'comicsLibrary.json';
     private configFileName = 'config.json';
+    //depracated
     comics: Comic[] = [];
     config: Config;
     private connection: Connection;
@@ -20,26 +21,20 @@ export class ComicsLibrary {
         if (fromJson) {
             this.loadLibraryFromJson();
         } else {
-            this.loadLibrary();
+            this.openConnection();
         }
     }
-    async loadLibrary() {
+    async openConnection() {
         this.connection = await createConnection();
-        let comicRepository = this.connection.getRepository(Comic);
-        this.comics = await comicRepository.find({ relations: ["publisher"] });
     }
+
+    //depracated
     loadLibraryFromJson() {
         this.comics = [];
         const comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
         for (const comic in comicsLibrary) {
             this.comics[comic] = new Comic(comicsLibrary[comic]);
         }
-    }
-
-    saveLibrary() {
-        this.jsonfile.writeFileSync(this.comicsLibraryFileName, this.comics, {
-            spaces: 2
-        });
     }
     saveConfig(config: Config) {
         if (config) {
@@ -67,7 +62,7 @@ export class ComicsLibrary {
         for (var comic in this.comics) {
             this.comics[comic].removeDuplicateIssues();
         }
-        this.saveLibrary();
+        //this.saveLibrary();
     }
     updateLibraryInfos(res) {
         function response(err) {
@@ -151,6 +146,12 @@ export class ComicsLibrary {
     updateReadingStatus(readingStatus: ReadingStatus) {
         let readingStatusRepository = this.connection.getRepository(ReadingStatus);
         readingStatusRepository.save(readingStatus);
+    }
+
+    async getComics(res) {
+        let comicRepository = this.connection.getRepository(Comic);
+        let comics = await comicRepository.find({ relations: ["publisher"] });
+        res.json(comics);
     }
 
     async getComic(res, comicId: number) {

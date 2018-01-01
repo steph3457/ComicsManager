@@ -41,17 +41,6 @@ app.post('/saveConfig', function (req, res) {
     comicsLibrary.saveConfig(req.body);
     res.json(comicsLibrary.config);
 });
-app.get('/getLibrary', function (req, res) {
-    res.json(comicsLibrary.comics);
-});
-app.get('/reloadLibrary', function (req, res) {
-    comicsLibrary.loadLibrary();
-    res.json(comicsLibrary.comics);
-});
-app.get('/saveLibrary', function (req, res) {
-    comicsLibrary.saveLibrary();
-    res.json(comicsLibrary.comics);
-});
 app.get('/parseComics', function (req, res) {
     comicsLibrary.parseComics(res);
 });
@@ -69,7 +58,9 @@ app.get('/updateLibraryInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos(res);
 });
 
-
+app.get('/api/comics', function (req, res) {
+    comicsLibrary.getComics(res);
+});
 app.get('/api/comic/:comic', function (req, res) {
     comicsLibrary.getComic(res, +req.params.comic);
 });
