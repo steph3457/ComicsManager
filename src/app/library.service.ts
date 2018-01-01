@@ -13,7 +13,7 @@ import { ReadingStatus } from '../lib/ReadingStatus';
 export class LibraryService {
 
   title: string = 'Comics Library';
-  comics: { [name: string]: Comic; } = {};
+  comics: Comic[] = [];
   config: Config;
   comicsComparer: (c1: Comic, c2: Comic) => number = Comic.ComicTitleComparer;
   comicsReverse: boolean = false;
@@ -22,10 +22,7 @@ export class LibraryService {
 
   constructor(private http: Http, private router: Router) {
     this.http.get('/api/comics').subscribe(res => {
-      var jsonRes = res.json();
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
+      this.comics = res.json();
     });
     this.http.get('/getConfig').subscribe(res => {
       var config = res.json();
@@ -36,11 +33,7 @@ export class LibraryService {
   parseComics(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Parsing comics", "pending...");
     this.http.get('/parseComics').subscribe(res => {
-      var jsonRes = res.json();
-      this.comics = {};
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
+      this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing comics", "complete", { timeOut: 2000 });
     });
@@ -48,11 +41,7 @@ export class LibraryService {
   parseIssues(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Parsing issues", "pending...");
     this.http.get('/parseIssues').subscribe(res => {
-      var jsonRes = res.json();
-      this.comics = {};
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
+      this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing issues", "complete", { timeOut: 2000 });
     });
@@ -72,23 +61,15 @@ export class LibraryService {
   findExactMapping(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Search comics infos", "pending...");
     this.http.get('/findExactMapping').subscribe(res => {
-      var jsonRes = res.json();
-      this.comics = {};
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
+      this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Search comics infos", "complete", { timeOut: 2000 });
     });
   }
   updateComicsInfos(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Update comics infos", "pending...");
-    this.http.get('/updateLibraryInfos').subscribe(res => {
-      var jsonRes = res.json();
-      this.comics = {};
-      for (var comic in jsonRes) {
-        this.comics[comic] = new Comic(jsonRes[comic]);
-      }
+    this.http.get('api/comics/updateInfos').subscribe(res => {
+      this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Update comics infos", "complete", { timeOut: 2000 });
     });

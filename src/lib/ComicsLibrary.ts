@@ -9,12 +9,14 @@ import { ReadingStatus } from '../entity/ReadingStatus';
 
 export class ComicsLibrary {
     private jsonfile = require('jsonfile');
-    private comicsLibraryFileName = 'comicsLibrary.json';
     private configFileName = 'config.json';
-    //depracated
-    comics: Comic[] = [];
     config: Config;
     private connection: Connection;
+
+    //depracated
+    private comicsLibraryFileName = 'comicsLibrary.json';
+    comics: Comic[] = [];
+    //
 
     constructor(fromJson: boolean) {
         this.config = new Config(this.jsonfile.readFileSync(this.configFileName, { throws: false }));
@@ -36,6 +38,7 @@ export class ComicsLibrary {
             this.comics[comic] = new Comic(comicsLibrary[comic]);
         }
     }
+    //
     saveConfig(config: Config) {
         if (config) {
             this.config = config;
@@ -63,21 +66,6 @@ export class ComicsLibrary {
             this.comics[comic].removeDuplicateIssues();
         }
         //this.saveLibrary();
-    }
-    updateLibraryInfos(res) {
-        function response(err) {
-            if (err) {
-                console.log(err);
-            }
-            this.saveLibrary();
-            if (res) {
-                res.json(this.comics);
-            }
-        }
-        function updateInfos(comic: Comic, callback) {
-            comic.updateInfos(this.config, callback);
-        }
-        async.each(this.comics, updateInfos.bind(this), response.bind(this));
     }
     private analyseComicsFolderName(folderName: string) {
         if (this.comics[folderName]) {
@@ -143,11 +131,6 @@ export class ComicsLibrary {
         async.each(this.comics, parseIssues, response.bind(this));
     }
 
-    updateReadingStatus(readingStatus: ReadingStatus) {
-        let readingStatusRepository = this.connection.getRepository(ReadingStatus);
-        readingStatusRepository.save(readingStatus);
-    }
-
     async getComics(res) {
         let comicRepository = this.connection.getRepository(Comic);
         let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
@@ -159,6 +142,21 @@ export class ComicsLibrary {
         let comicRepository = this.connection.getRepository(Comic);
         let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
         res.json(comic);
+    }
+
+    async updateLibraryInfos(res) {
+        let comicRepository = this.connection.getRepository(Comic);
+        let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        let config = this.config;
+        await comics.forEach(async (comic: Comic) => {
+            async function callback(error) {
+                await comicRepository.save(comic);
+            }
+            await comic.updateInfos(config, callback);
+        });
+        if (res) {
+            res.json(comics);
+        }
     }
 
     async updateComicInfos(res, comicId: number) {
@@ -193,4 +191,10 @@ export class ComicsLibrary {
             issue.readFile(this.config, res);
         }
     }
+
+    updateReadingStatus(readingStatus: ReadingStatus) {
+        let readingStatusRepository = this.connection.getRepository(ReadingStatus);
+        readingStatusRepository.save(readingStatus);
+    }
+
 }

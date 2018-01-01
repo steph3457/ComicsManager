@@ -54,12 +54,12 @@ app.get('/removeDuplicateIssues', function (req, res) {
     comicsLibrary.removeDuplicateIssues();
     res.json(comicsLibrary.comics);
 });
-app.get('/updateLibraryInfos', function (req, res) {
-    comicsLibrary.updateLibraryInfos(res);
-});
 
 app.get('/api/comics', function (req, res) {
     comicsLibrary.getComics(res);
+});
+app.get('/api/comics/updateInfos', function (req, res) {
+    comicsLibrary.updateLibraryInfos(res);
 });
 app.get('/api/comic/:comic', function (req, res) {
     comicsLibrary.getComic(res, +req.params.comic);

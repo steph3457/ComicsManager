@@ -71,13 +71,16 @@ export class Issue {
     }
   }
   updateFromComicVine(comicVineJson) {
-    this.title = comicVineJson.name;
-    this.api_detail_url = comicVineJson.api_detail_url;
-    this.site_detail_url = comicVineJson.site_detail_url;
-    this.comicVineId = comicVineJson.id;
-    this.number = parseFloat(comicVineJson.issue_number);
-    this.image = comicVineJson.image.thumb_url;
-    this.date = new Date(comicVineJson.store_date);
+    if (comicVineJson) {
+      if (comicVineJson.name)
+        this.title = comicVineJson.name;
+      this.api_detail_url = comicVineJson.api_detail_url;
+      this.site_detail_url = comicVineJson.site_detail_url;
+      this.comicVineId = comicVineJson.id;
+      this.number = parseFloat(comicVineJson.issue_number);
+      this.image = comicVineJson.image.thumb_url;
+      this.date = new Date(comicVineJson.store_date);
+    }
   }
 
   readFile(config: Config, res) {

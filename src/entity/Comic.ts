@@ -82,11 +82,6 @@ export class Comic {
         }
         this.count_of_missing_issues = this.count_of_issues - possessed;
         this.count_of_unread_issues = this.count_of_issues - read;
-        console.log(this.folder_name);
-        console.log(this.count_of_issues);
-        console.log(this.count_of_missing_issues);
-        console.log(this.count_of_unread_issues);
-
     }
 
     //Server part
