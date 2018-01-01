@@ -32,8 +32,8 @@ export class Issue {
   number: number;
   @OneToOne(type => ReadingStatus, readingStatus => readingStatus.issue, {
     cascadeInsert: true,
-    cascadeUpdate: true,
-    cascadeRemove: true
+    cascadeUpdate: false,
+    cascadeRemove: false
   })
   @JoinColumn()
   readingStatus: ReadingStatus;
@@ -116,15 +116,5 @@ export class Issue {
       imageList = imageList.map(x => extraFolder + "/" + x);
     }
     res.json(imageList);
-  }
-  markRead(force: boolean) {
-    if (force || !this.readingStatus.read) {
-      this.readingStatus.read = true;
-      this.readingStatus.currentPage = this.readingStatus.pageCount;
-    }
-    else {
-      this.readingStatus.read = false;
-      this.readingStatus.currentPage = 0;
-    }
   }
 }

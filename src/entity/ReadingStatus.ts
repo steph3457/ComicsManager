@@ -14,11 +14,12 @@ export class ReadingStatus {
     @Column({ default: 0 })
     currentPage: number;
 
-    constructor(issue: ReadingStatus) {
-        if (issue) {
-            this.pageCount = issue.pageCount;
-            this.currentPage = issue.currentPage;
-            this.read = issue.read;
+    constructor(readingStatus: ReadingStatus) {
+        if (readingStatus) {
+            this.pageCount = readingStatus.pageCount;
+            this.currentPage = readingStatus.currentPage;
+            this.read = readingStatus.read;
+            this.id = readingStatus.id;
         }
         else {
             this.pageCount = 0;

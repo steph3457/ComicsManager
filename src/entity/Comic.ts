@@ -96,7 +96,9 @@ export class Comic {
         }
         this.api_detail_url = comicVineJson.api_detail_url;
         this.site_detail_url = comicVineJson.site_detail_url;
-        this.publisher = new Publisher(comicVineJson.publisher);
+        if (this.publisher && comicVineJson.publisher && this.publisher.comicVineId !== comicVineJson.publisher.id) {
+            this.publisher = new Publisher(comicVineJson.publisher);
+        }
         this.comicVineId = comicVineJson.id;
         this.description = comicVineJson.description;
         this.year = comicVineJson.start_year;
@@ -117,7 +119,7 @@ export class Comic {
         }
         if (!found) {
             issue = new Issue(null);
-            this.issues[issueNumber] = issue;
+            this.issues.push(issue);
         }
         issue.updateFromComicVine(comicVineJson);
     }
@@ -293,7 +295,7 @@ export class Comic {
                 "unable to find extra information in comic vine for " +
                 this.folder_name
             );
-            callback();
+            callback(null);
             return;
         }
         this.updateComicInfos(config);
@@ -354,24 +356,5 @@ export class Comic {
             }
         }
         request(options, requestCallback.bind(this));
-    }
-
-    markIssueRead(issueName: string) {
-        if (this.issues[issueName]) {
-            this.issues[issueName].markRead(false);
-        }
-        this.updateCount();
-    }
-    markAllIssuesRead() {
-        for (var issue in this.issues) {
-            this.issues[issue].markRead(true);
-        }
-        this.updateCount();
-    }
-    updateReadingStatus(issue: Issue) {
-        if (issue.file_name && this.issues[issue.file_name]) {
-            this.issues[issue.file_name].readingStatus = issue.readingStatus;
-        }
-        this.updateCount();
     }
 }

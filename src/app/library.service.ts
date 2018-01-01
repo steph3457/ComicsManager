@@ -6,6 +6,7 @@ import { Filter } from "../lib/Filter";
 import { NotificationsService } from "angular2-notifications";
 import { Comic } from '../lib/Comic';
 import { Issue } from '../lib/Issue';
+import { ReadingStatus } from '../lib/ReadingStatus';
 
 
 @Injectable()
@@ -13,15 +14,11 @@ export class LibraryService {
 
   title: string = 'Comics Library';
   comics: { [name: string]: Comic; } = {};
-  comic: Comic;
-  issue: Issue;
-  images: string[];
-  count_of_possessed_issues: number = 0;
-  count_of_read_issues: number = 0;
   config: Config;
   comicsComparer: (c1: Comic, c2: Comic) => number = Comic.ComicTitleComparer;
   comicsReverse: boolean = false;
   filter: Filter = new Filter();
+  readingStatus: ReadingStatus = new ReadingStatus(null);
 
   constructor(private http: Http, private router: Router) {
     this.http.get('/getLibrary').subscribe(res => {
@@ -37,14 +34,9 @@ export class LibraryService {
     });
   }
   updateCount() {
-    this.count_of_possessed_issues = 0;
-    this.count_of_read_issues = 0;
     for (var c in this.comics) {
-
       var comic = this.comics[c];
       comic.updateCount();
-      this.count_of_possessed_issues += comic.count_of_possessed_issues;
-      this.count_of_read_issues += comic.count_of_read_issues;
     }
   }
   parseComics(notificationsService: NotificationsService) {
@@ -111,16 +103,6 @@ export class LibraryService {
     window.scrollTo(0, 0);
   }
 
-  markRead(issue: Issue) {
-    var body: any = { folder_name: this.comic.folder_name };
-    if (issue) {
-      body.file_name = issue.file_name;
-    }
-    this.http.post('/markRead', body).subscribe(res => {
-      this.comic = new Comic(res.json());
-      this.updateCount();
-    });
-  }
   findExactMapping(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Search comics infos", "pending...");
     this.http.get('/findExactMapping').subscribe(res => {
@@ -146,26 +128,6 @@ export class LibraryService {
       notificationsService.remove(notif.id);
       notificationsService.success("Update comics infos", "complete", { timeOut: 2000 });
     });
-  }
-  updateComicInfos(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Update comic infos", "pending...");
-    this.http.get('/updateLibraryInfos/' + encodeURI(this.comic.folder_name)).subscribe(res => {
-      this.comic = new Comic(res.json());
-      this.updateCount();
-      notificationsService.remove(notif.id);
-      notificationsService.success("Update comic infos", "complete", { timeOut: 2000 });
-    });
-  }
-  updateComicVineId(notificationsService: NotificationsService) {
-    let notif = notificationsService.info("Update comic infos", "pending...");
-    if (this.comic.comicVineId) {
-      this.http.get('/updateComicVineId/' + encodeURI(this.comic.folder_name) + "/" + this.comic.comicVineId).subscribe(res => {
-        this.comic = new Comic(res.json());
-        this.updateCount();
-        notificationsService.remove(notif.id);
-        notificationsService.success("Update comic infos", "complete", { timeOut: 2000 });
-      });
-    }
   }
 
   getPossessedCount(comic: Comic): number {

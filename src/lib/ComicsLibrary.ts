@@ -5,6 +5,7 @@ import { Config } from './Config';
 import { Comic } from '../entity/Comic';
 import { createConnection, ConnectionOptions, Connection } from "typeorm";
 import { Publisher } from '../entity/Publisher';
+import { ReadingStatus } from '../entity/ReadingStatus';
 
 export class ComicsLibrary {
     private jsonfile = require('jsonfile');
@@ -147,28 +148,40 @@ export class ComicsLibrary {
         async.each(this.comics, parseIssues, response.bind(this));
     }
 
-    markRead(issue: Issue) {
-        if (issue.folder_name && this.comics[issue.folder_name]) {
-            if (issue.file_name) {
-                this.comics[issue.folder_name].markIssueRead(issue.file_name);
-            }
-            else {
-                this.comics[issue.folder_name].markAllIssuesRead();
-            }
-        }
-        this.saveLibrary();
-    }
-    updateReadingStatus(issue: Issue) {
-        if (issue.folder_name && this.comics[issue.folder_name]) {
-            this.comics[issue.folder_name].updateReadingStatus(issue);
-        }
-        this.saveLibrary();
+    updateReadingStatus(readingStatus: ReadingStatus) {
+        let readingStatusRepository = this.connection.getRepository(ReadingStatus);
+        readingStatusRepository.save(readingStatus);
     }
 
     async getComic(res, comicId: number) {
         let comicRepository = this.connection.getRepository(Comic);
         let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
         res.json(comic);
+    }
+
+    async updateComicInfos(res, comicId: number) {
+        let comicRepository = this.connection.getRepository(Comic);
+        let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        async function callback(error) {
+            await comicRepository.save(comic);
+            res.json(comic);
+        }
+        comic.updateInfos(this.config, callback);
+    }
+
+    async updateComicVineId(res, comicId: number, comicVineId: number) {
+        let comicRepository = this.connection.getRepository(Comic);
+        let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        async function callback(error) {
+            await comicRepository.save(comic);
+            res.json(comic);
+        }
+        if (comic && comicVineId && comic.comicVineId !== comicVineId) {
+            comic.comicVineId = comicVineId;
+            comic.updateInfos(this.config, callback);
+        } else {
+            res.json(comic);
+        }
     }
 
     async read(res, issueId: number) {

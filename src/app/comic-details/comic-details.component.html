@@ -33,12 +33,12 @@
         <td class="clickable" (click)="read(issue)">{{issue.file_name}}</td>
         <td>{{issue.title}}</td>
         <td>{{issue.date |date:'longDate'}}</td>
-        <td class="clickable" (click)="libraryService.markRead(issue)">
+        <td class="clickable" (click)="markRead(issue)">
           {{issue.readingStatus.currentPage}}/{{issue.readingStatus.pageCount}}
         </td>
       </tr>
     </table>
   </div>
-  <button (click)="libraryService.markRead(null)">Mark all read</button>
-  <button (click)="libraryService.updateComicInfos(notificationsService)">Update Infos</button>
+  <button (click)="markAllRead()">Mark all read</button>
+  <button (click)="updateComicInfos()">Update Infos</button>
 </div>

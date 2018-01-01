@@ -23,6 +23,7 @@ export class ReaderComponent implements OnInit {
     private http: Http,
   ) { }
   ngOnInit() {
+    this.readingStatus = this.libraryService.readingStatus;
     this.fullScreen(true);
     this.issueId = + this.route.snapshot.paramMap.get('id');
     this.http.get('/api/read/' + this.issueId).subscribe(res => {
@@ -48,12 +49,11 @@ export class ReaderComponent implements OnInit {
   }
 
   backToComic() {
-    this.location.back();
-    this.http.post('/updateReadingStatus', this.readingStatus).subscribe(res => {
-      //this.comic = new Comic(res.json());
-      //this.updateCount();
+    this.loading = true;
+    this.http.post('/api/readingStatus', this.readingStatus).subscribe(res => {
+      this.location.back();
+      this.fullScreen(false);
     });
-    this.fullScreen(false);
   }
 
   isCurrentPage(index: number): boolean {

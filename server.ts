@@ -68,28 +68,16 @@ app.get('/removeDuplicateIssues', function (req, res) {
 app.get('/updateLibraryInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos(res);
 });
-app.get('/updateLibraryInfos/:comic', function (req, res) {
-    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config, (err) => { res.json(comicsLibrary.comics[req.params.comic]); });
-});
-app.get('/updateComicVineId/:comic/:id', function (req, res) {
-    var comicVineId = parseInt(req.params.id);
-    var comic = comicsLibrary.comics[req.params.comic];
-    if (comicVineId && comic.comicVineId !== comicVineId) {
-        comic.comicVineId = comicVineId;
-        comic.updateInfos(comicsLibrary.config, (err) => { res.json(comicsLibrary.comics[req.params.comic]); });
-    }
-});
-app.post('/updateReadingStatus', function (req, res) {
-    comicsLibrary.updateReadingStatus(req.body);
-    res.json(comicsLibrary.comics[req.body.folder_name]);
-});
-app.post('/markRead', function (req, res) {
-    comicsLibrary.markRead(req.body);
-    res.json(comicsLibrary.comics[req.body.folder_name]);
-});
+
 
 app.get('/api/comic/:comic', function (req, res) {
     comicsLibrary.getComic(res, +req.params.comic);
+});
+app.get('/api/comic/:comic/updateInfos', function (req, res) {
+    comicsLibrary.updateComicInfos(res, +req.params.comic);
+});
+app.post('/api/comic/:comic/updateComicVineId', function (req, res) {
+    comicsLibrary.updateComicVineId(res, +req.params.comic, parseInt(req.body.comicVineId));
 });
 app.get('/api/read/:issue', function (req, res) {
     comicsLibrary.read(res, req.params.issue);
@@ -97,6 +85,10 @@ app.get('/api/read/:issue', function (req, res) {
 app.get('/api/image/:issue/:image', function (req, res) {
     var image = path.resolve("./temp", req.params.issue, req.params.image);
     res.sendFile(image);
+});
+app.post('/api/readingStatus', function (req, res) {
+    comicsLibrary.updateReadingStatus(req.body);
+    res.json(comicsLibrary.comics[req.body.folder_name]);
 });
 
 app.listen(3001, function () {
