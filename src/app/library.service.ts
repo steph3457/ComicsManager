@@ -26,19 +26,13 @@ export class LibraryService {
       for (var comic in jsonRes) {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
-      this.updateCount();
     });
     this.http.get('/getConfig').subscribe(res => {
       var config = res.json();
       this.config = new Config(config);
     });
   }
-  updateCount() {
-    for (var c in this.comics) {
-      var comic = this.comics[c];
-      comic.updateCount();
-    }
-  }
+
   parseComics(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Parsing comics", "pending...");
     this.http.get('/parseComics').subscribe(res => {
@@ -47,7 +41,6 @@ export class LibraryService {
       for (var comic in jsonRes) {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
-      this.updateCount();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing comics", "complete", { timeOut: 2000 });
     });
@@ -60,7 +53,6 @@ export class LibraryService {
       for (var comic in jsonRes) {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
-      this.updateCount();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing issues", "complete", { timeOut: 2000 });
     });
@@ -85,7 +77,6 @@ export class LibraryService {
       for (var comic in jsonRes) {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
-      this.updateCount();
       notificationsService.remove(notif.id);
       notificationsService.success("Search comics infos", "complete", { timeOut: 2000 });
     });
@@ -98,14 +89,9 @@ export class LibraryService {
       for (var comic in jsonRes) {
         this.comics[comic] = new Comic(jsonRes[comic]);
       }
-      this.updateCount();
       notificationsService.remove(notif.id);
       notificationsService.success("Update comics infos", "complete", { timeOut: 2000 });
     });
-  }
-
-  getPossessedCount(comic: Comic): number {
-    return comic.count_of_possessed_issues;
   }
 
   getComics(): Comic[] {

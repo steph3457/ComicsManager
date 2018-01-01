@@ -19,19 +19,12 @@ export class Comic {
     image: string = "";
     @Column({ default: "" })
     comicVineId: number;
-    @Column({ default: 0 })
-    count_of_issues: number = 0;
-    @Column({ default: 0 })
-    count_of_possessed_issues: number = 0;
-    @Column({ default: 0 })
-    count_of_read_issues: number = 0;
     @Column({ default: "" })
     description: string = "";
     @Column({ default: "" })
     api_detail_url: string = "";
     @Column({ default: "" })
     site_detail_url: string = "";
-
     @ManyToOne(type => Publisher, publisher => publisher.comics, {
         nullable: true,
         cascadeInsert: true,
@@ -47,6 +40,9 @@ export class Comic {
     @Column({ default: false })
     finished: boolean = false;
 
+    count_of_issues: number = 0;
+    count_of_missing_issues: number = 0;
+    count_of_unread_issues: number = 0;
 
     constructor(comic: Comic) {
         if (comic) {
@@ -56,8 +52,8 @@ export class Comic {
             this.image = comic.image;
             this.comicVineId = comic.comicVineId;
             this.count_of_issues = comic.count_of_issues;
-            this.count_of_possessed_issues = comic.count_of_possessed_issues;
-            this.count_of_read_issues = comic.count_of_possessed_issues;
+            this.count_of_missing_issues = comic.count_of_missing_issues;
+            this.count_of_unread_issues = comic.count_of_unread_issues;
             this.description = comic.description;
             this.api_detail_url = comic.api_detail_url;
             this.site_detail_url = comic.site_detail_url;
@@ -72,8 +68,10 @@ export class Comic {
     updateCount() {
         let possessed = 0;
         let read = 0;
+        this.count_of_issues = 0;
         for (const issue in this.issues) {
             if (!this.issues[issue].annual) {
+                this.count_of_issues++;
                 if (this.issues[issue].readingStatus.read) {
                     read++;
                 }
@@ -82,8 +80,13 @@ export class Comic {
                 }
             }
         }
-        this.count_of_possessed_issues = possessed;
-        this.count_of_read_issues = read;
+        this.count_of_missing_issues = this.count_of_issues - possessed;
+        this.count_of_unread_issues = this.count_of_issues - read;
+        console.log(this.folder_name);
+        console.log(this.count_of_issues);
+        console.log(this.count_of_missing_issues);
+        console.log(this.count_of_unread_issues);
+
     }
 
     //Server part

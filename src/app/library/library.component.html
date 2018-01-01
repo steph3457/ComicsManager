@@ -6,12 +6,9 @@
     <div class="panel-body">
       <div class="table-responsive">
         <div class="btn-group">
-          <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="unread"
-         uncheckable>Unread</label>
-          <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="missing"
-         uncheckable>Missing</label>
-         <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="unmapped"
-         uncheckable>Unmapped</label>
+          <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="unread" uncheckable>Unread</label>
+          <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="missing" uncheckable>Missing</label>
+          <label class="btn btn-primary" [(ngModel)]="libraryService.filter.restriction" btnRadio="unmapped" uncheckable>Unmapped</label>
         </div>
         <input type="text" id="search" [(ngModel)]="libraryService.filter.search" placeholder="Filter by name...">
         <table class="table table-striped table-hover">
@@ -26,12 +23,12 @@
             <td>
               <div *ngIf="comic.image" class="readingStatus">
                 <img src="{{comic.image}}" class="img-responsive">
-                <span class="badge missing">{{comic.count_of_issues-comic.count_of_possessed_issues}}</span>
-                <span class="badge toRead">{{comic.count_of_possessed_issues-comic.count_of_read_issues}}</span>
+                <span class="badge missing">{{comic.count_of_missing_issues}}</span>
+                <span class="badge toRead">{{comic.count_of_unread_issues}}</span>
               </div>
               <div *ngIf="!comic.image" class="">
                 <span class="badge">{{comic.count_of_possessed_issues}}</span>
-                <span class="badge toRead">{{comic.count_of_possessed_issues-comic.count_of_read_issues}}</span>
+                <span class="badge toRead">{{comic.count_of_unread_issues}}</span>
               </div>
             </td>
             <td>{{comic.title}}</td>

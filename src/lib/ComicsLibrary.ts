@@ -150,7 +150,8 @@ export class ComicsLibrary {
 
     async getComics(res) {
         let comicRepository = this.connection.getRepository(Comic);
-        let comics = await comicRepository.find({ relations: ["publisher"] });
+        let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        comics.forEach((comic: Comic) => comic.updateCount());
         res.json(comics);
     }
 

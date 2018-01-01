@@ -9,8 +9,8 @@ export class Comic {
     image: string = "";
     comicVineId: number;
     count_of_issues: number = 0;
-    count_of_possessed_issues: number = 0;
-    count_of_read_issues: number = 0;
+    count_of_missing_issues: number = 0;
+    count_of_unread_issues: number = 0;
     description: string = "";
     api_detail_url: string = "";
     site_detail_url: string = "";
@@ -46,8 +46,8 @@ export class Comic {
             this.image = comic.image;
             this.comicVineId = comic.comicVineId;
             this.count_of_issues = comic.count_of_issues;
-            this.count_of_possessed_issues = comic.count_of_possessed_issues;
-            this.count_of_read_issues = comic.count_of_possessed_issues;
+            this.count_of_missing_issues = comic.count_of_missing_issues;
+            this.count_of_unread_issues = comic.count_of_unread_issues;
             this.description = comic.description;
             this.api_detail_url = comic.api_detail_url;
             this.site_detail_url = comic.site_detail_url;
@@ -103,22 +103,5 @@ export class Comic {
             default:
                 break;
         }
-    }
-
-    updateCount() {
-        let possessed = 0;
-        let read = 0;
-        for (const issue in this.issues) {
-            if (!this.issues[issue].annual) {
-                if (this.issues[issue].readingStatus.read) {
-                    read++;
-                }
-                if (this.issues[issue].possessed) {
-                    possessed++;
-                }
-            }
-        }
-        this.count_of_possessed_issues = possessed;
-        this.count_of_read_issues = read;
     }
 }
