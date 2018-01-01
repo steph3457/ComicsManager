@@ -278,7 +278,7 @@ export class Comic {
                 } else if (!found) {
                     console.log("Not Found : " + this.title);
                 }
-                callback();
+                callback(null, found);
             } else {
                 console.log("Error: " + error);
                 console.log("Status: " + response.statusCode);

@@ -47,9 +47,6 @@ app.get('/parseComics', function (req, res) {
 app.get('/parseIssues', function (req, res) {
     comicsLibrary.parseIssues(res);
 });
-app.get('/findExactMapping', function (req, res) {
-    comicsLibrary.findExactMapping(res);
-});
 app.get('/removeDuplicateIssues', function (req, res) {
     comicsLibrary.removeDuplicateIssues();
     res.json(comicsLibrary.comics);
@@ -60,6 +57,9 @@ app.get('/api/comics', function (req, res) {
 });
 app.get('/api/comics/updateInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos(res);
+});
+app.get('/api/comics/findExactMapping', function (req, res) {
+    comicsLibrary.findExactMapping(res);
 });
 app.get('/api/comic/:comic', function (req, res) {
     comicsLibrary.getComic(res, +req.params.comic);

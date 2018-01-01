@@ -48,19 +48,6 @@ export class ComicsLibrary {
         });
     }
 
-    findExactMapping(res) {
-        function response(err) {
-            if (err) {
-                console.log(err);
-            }
-            this.saveLibrary();
-            res.json(this.comics);
-        }
-        function findExactMapping(comic: Comic, callback) {
-            comic.findExactMapping(this.config, callback);
-        }
-        async.each(this.comics, findExactMapping.bind(this), response.bind(this));
-    }
     removeDuplicateIssues() {
         for (var comic in this.comics) {
             this.comics[comic].removeDuplicateIssues();
@@ -144,16 +131,36 @@ export class ComicsLibrary {
         res.json(comic);
     }
 
+    async findExactMapping(res) {
+        let comicRepository = this.connection.getRepository(Comic);
+        let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        let config = this.config;
+        for (let comicId in comics) {
+            let comic = comics[comicId];
+            if (!comic.comicVineId) {
+                async function callback(error, found) {
+                    if (found)
+                        await comicRepository.save(comic);
+                }
+                await comic.findExactMapping(config, callback);
+            }
+        }
+        res.json(comics);
+    }
+
     async updateLibraryInfos(res) {
         let comicRepository = this.connection.getRepository(Comic);
         let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
         let config = this.config;
-        await comics.forEach(async (comic: Comic) => {
-            async function callback(error) {
-                await comicRepository.save(comic);
+        for (let comicId in comics) {
+            let comic = comics[comicId];
+            if (!comic.finished) {
+                async function callback(error) {
+                    await comicRepository.save(comic);
+                }
+                await comic.updateInfos(config, callback);
             }
-            await comic.updateInfos(config, callback);
-        });
+        }
         if (res) {
             res.json(comics);
         }

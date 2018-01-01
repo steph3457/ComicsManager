@@ -60,7 +60,7 @@ export class LibraryService {
 
   findExactMapping(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Search comics infos", "pending...");
-    this.http.get('/findExactMapping').subscribe(res => {
+    this.http.get('/api/comics/findExactMapping').subscribe(res => {
       this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Search comics infos", "complete", { timeOut: 2000 });
@@ -68,7 +68,7 @@ export class LibraryService {
   }
   updateComicsInfos(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Update comics infos", "pending...");
-    this.http.get('api/comics/updateInfos').subscribe(res => {
+    this.http.get('/api/comics/updateInfos').subscribe(res => {
       this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Update comics infos", "complete", { timeOut: 2000 });
