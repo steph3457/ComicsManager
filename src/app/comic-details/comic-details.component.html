@@ -1,14 +1,16 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <div id="title">
-      <h2 (click)="editMode()">{{libraryService.comic.title}} - {{libraryService.comic.publisher?.name}} ({{libraryService.comic.year}})</h2>
-      <div [hidden]="edit">{{libraryService.comic.comicVineId}}</div>
-      <div [hidden]="!edit"><input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="libraryService.comic.comicVineId"></div>
+      <h2 (click)="editMode()">{{comic.title}} - {{comic.publisher?.name}} ({{comic.year}})</h2>
+      <div [hidden]="edit">{{comic.comicVineId}}</div>
+      <div [hidden]="!edit">
+        <input id="comicVineIdInput" type="text" class="form-control" [(ngModel)]="comic.comicVineId">
+      </div>
     </div>
   </div>
   <div class="panel-body">
-    <img *ngIf="libraryService.comic.image" [src]="libraryService.comic.image" class="thumb description img-responsive">
-    <p [innerHTML]="libraryService.comic.description"></p>
+    <img *ngIf="comic.image" [src]="comic.image" class="thumb description img-responsive">
+    <p [innerHTML]="comic.description"></p>
   </div>
 </div>
 
@@ -17,28 +19,26 @@
     <table class="table table-striped table-hover">
       <thead class="thead-default">
         <th>Image</th>
-        <th (click)="libraryService.comic.sortBy('number')">#Issue</th>
-        <th (click)="libraryService.comic.sortBy('file')">File name</th>
-        <th (click)="libraryService.comic.sortBy('title')">Title</th>
-        <th (click)="libraryService.comic.sortBy('date')">Date</th>
+        <th (click)="comic.sortBy('number')">#Issue</th>
+        <th (click)="comic.sortBy('file')">File name</th>
+        <th (click)="comic.sortBy('title')">Title</th>
+        <th (click)="comic.sortBy('date')">Date</th>
         <th>Read</th>
       </thead>
-      <tr *ngFor="let issue of libraryService.comic.getIssues()" [class]="issue.getClass()">
-        <td><img *ngIf="issue.image" src="{{issue.image}}" class="thumb img-responsive"></td>
+      <tr *ngFor="let issue of comic.getIssues()" [class]="issue.getClass()">
+        <td>
+          <img *ngIf="issue.image" src="{{issue.image}}" class="thumb img-responsive">
+        </td>
         <td>{{issue.number}}</td>
-        <td class="clickable" (click)="libraryService.read(issue)">{{issue.file_name}}</td>
+        <td class="clickable" (click)="read(issue)">{{issue.file_name}}</td>
         <td>{{issue.title}}</td>
         <td>{{issue.date |date:'longDate'}}</td>
-        <td class="clickable" (click)="libraryService.markRead(issue)">
+        <td class="clickable" (click)="markRead(issue)">
           {{issue.readingStatus.currentPage}}/{{issue.readingStatus.pageCount}}
         </td>
       </tr>
     </table>
   </div>
-  <button (click)="libraryService.markRead(null)">Mark all read</button>
-  <button (click)="libraryService.updateComicInfos(notificationsService)">Update Infos</button>
-</div>
-
-<div class="loading" [hidden]="!libraryService.loading">
-  <img src="../assets/loading.gif" class="img-responsive">
+  <button (click)="markAllRead()">Mark all read</button>
+  <button (click)="updateComicInfos()">Update Infos</button>
 </div>

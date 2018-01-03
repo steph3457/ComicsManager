@@ -1,22 +1,15 @@
-import express = require('express');
-import path = require('path');
-import logger = require('morgan');
-import cookieParser = require('cookie-parser');
-import bodyParser = require('body-parser');
-import compression = require('compression');
+import "reflect-metadata";
+import * as express from 'express';
+import * as path from "path";
+import * as logger from 'morgan';
+import * as cookieParser from 'cookie-parser';
+import * as  bodyParser from 'body-parser';
+import * as compression from 'compression';
 import { ComicsLibrary } from "./src/lib/ComicsLibrary";
-import fs = require('fs');
-import https = require('https');
-
-var key = fs.readFileSync('./key.pem');
-var cert = fs.readFileSync('./cert.pem')
-var https_options = {
-    key: key,
-    cert: cert
-};
+import * as fs from 'fs';
 
 var app = express();
-var comicsLibrary = new ComicsLibrary();
+var comicsLibrary = new ComicsLibrary(false);
 var bodyParser = require('body-parser');
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -48,68 +41,46 @@ app.post('/saveConfig', function (req, res) {
     comicsLibrary.saveConfig(req.body);
     res.json(comicsLibrary.config);
 });
-app.get('/getLibrary', function (req, res) {
-    res.json(comicsLibrary.comics);
+
+app.get('/api/comics', function (req, res) {
+    comicsLibrary.getComics(res);
 });
-app.get('/reloadLibrary', function (req, res) {
-    comicsLibrary.loadLibrary();
-    res.json(comicsLibrary.comics);
-});
-app.get('/saveLibrary', function (req, res) {
-    comicsLibrary.saveLibrary();
-    res.json(comicsLibrary.comics);
-});
-app.get('/parseComics', function (req, res) {
+app.get('/api/comics/parse', function (req, res) {
     comicsLibrary.parseComics(res);
 });
-app.get('/parseIssues', function (req, res) {
-    comicsLibrary.parseIssues(res);
-});
-app.get('/findExactMapping', function (req, res) {
-    comicsLibrary.findExactMapping(res);
-});
-app.get('/removeDuplicateIssues', function (req, res) {
-    comicsLibrary.removeDuplicateIssues();
-    res.json(comicsLibrary.comics);
-});
-app.get('/updateLibraryInfos', function (req, res) {
+app.get('/api/comics/updateInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos(res);
 });
-app.get('/updateLibraryInfos/:comic', function (req, res) {
-    comicsLibrary.comics[req.params.comic].updateInfos(comicsLibrary.config, (err) => { res.json(comicsLibrary.comics[req.params.comic]); });
+app.get('/api/comics/findExactMapping', function (req, res) {
+    comicsLibrary.findExactMapping(res);
 });
-app.get('/updateComicVineId/:comic/:id', function (req, res) {
-    var comicVineId = parseInt(req.params.id);
-    var comic = comicsLibrary.comics[req.params.comic];
-    if (comicVineId && comic.comicVineId !== comicVineId) {
-        comic.comicVineId = comicVineId;
-        comic.updateInfos(comicsLibrary.config, (err) => { res.json(comicsLibrary.comics[req.params.comic]); });
-    }
+app.get('/api/comic/:comic', function (req, res) {
+    comicsLibrary.getComic(res, +req.params.comic);
 });
-app.post('/updateReadingStatus', function (req, res) {
+app.get('/api/comic/:comic/updateInfos', function (req, res) {
+    comicsLibrary.updateComicInfos(res, +req.params.comic);
+});
+app.post('/api/comic/:comic/updateComicVineId', function (req, res) {
+    comicsLibrary.updateComicVineId(res, +req.params.comic, parseInt(req.body.comicVineId));
+});
+app.get('/api/issues/parse', function (req, res) {
+    comicsLibrary.parseIssues(res);
+});
+app.get('/api/read/:issue', function (req, res) {
+    comicsLibrary.read(res, req.params.issue);
+});
+app.get('/api/image/:issue/:image', function (req, res) {
+    var image = path.resolve("./temp", req.params.issue, req.params.image);
+    res.sendFile(image);
+});
+app.post('/api/readingStatus', function (req, res) {
     comicsLibrary.updateReadingStatus(req.body);
     res.json(comicsLibrary.comics[req.body.folder_name]);
-});
-app.post('/markRead', function (req, res) {
-    comicsLibrary.markRead(req.body);
-    res.json(comicsLibrary.comics[req.body.folder_name]);
-});
-app.get('/read/:comic/:issue', function (req, res) {
-    comicsLibrary.read(req.params.comic, req.params.issue, res);
-});
-app.get('/image/:comic/:issue/:image', function (req, res) {
-    var image = path.resolve("./temp", req.params.comic, req.params.issue, req.params.image);
-    console.log("image requested: " + image);
-    res.sendFile(image);
 });
 
 app.listen(3001, function () {
     console.log('Example app listening on port 3001!');
 });
-
-var server = https.createServer(https_options, app).listen(3000, "0.0.0.0");
-console.log('HTTPS Server listening on %s:%s', "localhost", 3000);
-
 
 var schedule = require('node-schedule');
 schedule.scheduleJob('0 7 * * 3', function () {

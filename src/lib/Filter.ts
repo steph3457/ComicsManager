@@ -1,7 +1,8 @@
 import { Comic } from "./Comic";
+
 export class Filter {
     search: string = "";
-    restriction: string= null;
+    restriction: string = "unread";
     constructor() { }
 
     public match(comic: Comic): boolean {
@@ -25,10 +26,10 @@ export class Filter {
 
     }
     private matchUnread(comic: Comic): boolean {
-        return comic.count_of_possessed_issues > comic.count_of_read_issues;
+        return comic.count_of_unread_issues > 0;
     }
     private matchMissing(comic: Comic): boolean {
-        return comic.count_of_issues > comic.count_of_possessed_issues;
+        return comic.count_of_missing_issues > 0;
     }
     private matchunmapped(comic: Comic): boolean {
         if (comic.comicVineId) {

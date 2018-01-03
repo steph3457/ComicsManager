@@ -1,21 +1,90 @@
-import { Comic } from "./Comic";
-import * as request from "request";
-import { Config } from "./Config";
-import { IssueServer } from "./IssueServer";
-import { Publisher } from "./Publisher";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
 import * as path from "path";
+import { Config } from "../lib/Config";
+import * as request from "request";
+import { Publisher } from "./Publisher";
+import { Issue } from "./Issue";
 
-export class ComicServer extends Comic {
-    issues: { [name: string]: IssueServer } = {};
-    constructor(comic: ComicServer) {
-        super(comic);
+@Entity()
+export class Comic {
+    @PrimaryGeneratedColumn()
+    id: number;
+    @Column({ default: "", unique: true })
+    folder_name: string = "";
+    @Column({ default: "" })
+    title: string = "";
+    @Column({ default: "" })
+    year: string = "";
+    @Column({ default: "" })
+    image: string = "";
+    @Column({ default: "" })
+    comicVineId: number;
+    @Column({ default: "" })
+    description: string = "";
+    @Column({ default: "" })
+    api_detail_url: string = "";
+    @Column({ default: "" })
+    site_detail_url: string = "";
+    @ManyToOne(type => Publisher, publisher => publisher.comics, {
+        nullable: true,
+        cascadeInsert: true,
+        cascadeUpdate: true,
+        cascadeRemove: false
+    })
+    publisher: Publisher;
+    @OneToMany(type => Issue, issue => issue.comic, {
+        cascadeInsert: true,
+        cascadeUpdate: true
+    })
+    issues: Issue[] = [];
+    @Column({ default: false })
+    finished: boolean = false;
+
+    count_of_issues: number = 0;
+    count_of_missing_issues: number = 0;
+    count_of_unread_issues: number = 0;
+
+    constructor(comic: Comic) {
         if (comic) {
+            this.folder_name = comic.folder_name;
+            this.title = comic.title;
+            this.year = comic.year;
+            this.image = comic.image;
+            this.comicVineId = comic.comicVineId;
+            this.count_of_issues = comic.count_of_issues;
+            this.count_of_missing_issues = comic.count_of_missing_issues;
+            this.count_of_unread_issues = comic.count_of_unread_issues;
+            this.description = comic.description;
+            this.api_detail_url = comic.api_detail_url;
+            this.site_detail_url = comic.site_detail_url;
+            this.publisher = new Publisher(comic.publisher);
+            this.finished = comic.finished;
             for (const issue in comic.issues) {
-                this.issues[issue] = new IssueServer(comic.issues[issue]);
+                this.issues.push(new Issue(comic.issues[issue]));
             }
         }
     }
 
+    updateCount() {
+        let possessed = 0;
+        let read = 0;
+        this.count_of_issues = 0;
+        for (const issue in this.issues) {
+            if (!this.issues[issue].annual) {
+                this.count_of_issues++;
+                if (this.issues[issue].readingStatus.read) {
+                    read++;
+                }
+                if (this.issues[issue].possessed) {
+                    possessed++;
+                }
+            }
+        }
+        this.count_of_missing_issues = this.count_of_issues - possessed;
+        this.count_of_unread_issues = this.count_of_issues - read;
+    }
+
+    //Server part
     update(comicVineJson) {
         this.count_of_issues = comicVineJson.issues
             ? comicVineJson.issues.length
@@ -25,7 +94,9 @@ export class ComicServer extends Comic {
         }
         this.api_detail_url = comicVineJson.api_detail_url;
         this.site_detail_url = comicVineJson.site_detail_url;
-        this.publisher = new Publisher(comicVineJson.publisher);
+        if (this.publisher && comicVineJson.publisher && this.publisher.comicVineId !== comicVineJson.publisher.id) {
+            this.publisher = new Publisher(comicVineJson.publisher);
+        }
         this.comicVineId = comicVineJson.id;
         this.description = comicVineJson.description;
         this.year = comicVineJson.start_year;
@@ -34,7 +105,7 @@ export class ComicServer extends Comic {
     updateIssueInformation(comicVineJson) {
         const issueNumber: number = parseFloat(comicVineJson.issue_number);
         let found = false;
-        let issue: IssueServer;
+        let issue: Issue;
         for (const i in this.issues) {
             if (
                 this.issues[i].number === issueNumber &&
@@ -45,85 +116,10 @@ export class ComicServer extends Comic {
             }
         }
         if (!found) {
-            issue = new IssueServer(null);
-            this.issues[issueNumber] = issue;
+            issue = new Issue(null);
+            this.issues.push(issue);
         }
         issue.updateFromComicVine(comicVineJson);
-    }
-
-    parseIssues(comicsPath: string, callback) {
-        const fs = require("fs");
-        const issuesFolder = path.resolve(comicsPath, this.folder_name);
-        fs.readdir(issuesFolder, (err, list) => {
-            if (err) {
-                console.log(err);
-                callback(err);
-                return;
-            }
-            console.log("Scanning: " + issuesFolder);
-            list.forEach(element => {
-                if (
-                    element.indexOf("._") !== 0 &&
-                    element.match(/\.(cbr|cbz)$/i)
-                ) {
-                    this.analyseIssueName(element);
-                } else {
-                    console.log("----Not an issue: " + element);
-                }
-            });
-            this.updateCount();
-            callback();
-        });
-    }
-
-    private analyseIssueName(issueName: string) {
-        let issue = this.issues[issueName];
-        if (!issue) {
-            console.log("New Issue: " + issueName);
-            issue = new IssueServer(null);
-            issue.folder_name = this.folder_name;
-            issue.file_name = issueName;
-            issue.possessed = true;
-            let issueNameSplitted = issueName.match(
-                /(.*?)([0-9.]{2,}).*\(([0-9]{4})\).*/
-            );
-            if (issueNameSplitted && issueNameSplitted.length === 4) {
-                issue.title = issueNameSplitted[1].replace(/_/g, " ");
-                issue.number = parseFloat(issueNameSplitted[2]);
-                issue.year = issueNameSplitted[3];
-            } else {
-                issueNameSplitted = issueName.match(/(.*) #([0-9]*).*/);
-                if (issueNameSplitted && issueNameSplitted.length === 3) {
-                    issue.title = issueNameSplitted[1].replace(/_/g, " ");
-                    issue.number = parseFloat(issueNameSplitted[2]);
-                }
-            }
-
-            if (issueName.indexOf("Annual") > 0) {
-                issue.annual = true;
-            }
-            this.issues[issueName] = issue;
-        }
-
-        if (this.issues[issue.number]) {
-            issue = new IssueServer(this.issues[issue.number]);
-            delete this.issues[issue.number];
-            issue.folder_name = this.folder_name;
-            issue.file_name = issueName;
-            issue.possessed = true;
-            this.issues[issueName] = issue;
-            console.log("mapping new issue to comic vine issue");
-        }
-    }
-
-    removeDuplicateIssues() {
-        for (const i in this.issues) {
-            const issue = this.issues[i];
-            const issueNumber = parseFloat(i);
-            if (issueNumber !== issue.number && this.issues[issue.number]) {
-                delete this.issues[issue.number];
-            }
-        }
     }
 
     findExactMapping(config: Config, callback) {
@@ -207,7 +203,7 @@ export class ComicServer extends Comic {
                 } else if (!found) {
                     console.log("Not Found : " + this.title);
                 }
-                callback();
+                callback(null, found);
             } else {
                 console.log("Error: " + error);
                 console.log("Status: " + response.statusCode);
@@ -222,7 +218,7 @@ export class ComicServer extends Comic {
                 "unable to find extra information in comic vine for " +
                 this.folder_name
             );
-            callback();
+            callback(null);
             return;
         }
         this.updateComicInfos(config);
@@ -284,29 +280,4 @@ export class ComicServer extends Comic {
         }
         request(options, requestCallback.bind(this));
     }
-
-    read(issueName: string, config: Config, res) {
-        if (this.issues[issueName]) {
-            return this.issues[issueName].readFile(config, res);
-        }
-    }
-    markIssueRead(issueName: string) {
-        if (this.issues[issueName]) {
-            this.issues[issueName].markRead(false);
-        }
-        this.updateCount();
-    }
-    markAllIssuesRead() {
-        for (var issue in this.issues) {
-            this.issues[issue].markRead(true);
-        }
-        this.updateCount();
-    }
-    updateReadingStatus(issue: IssueServer) {
-        if (issue.file_name && this.issues[issue.file_name]) {
-            this.issues[issue.file_name].readingStatus = issue.readingStatus;
-        }
-        this.updateCount();
-    }
 }
-                                
