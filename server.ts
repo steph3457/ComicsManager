@@ -66,6 +66,9 @@ app.post('/api/comic/:comic/updateComicVineId', function (req, res) {
 app.get('/api/issues/parse', function (req, res) {
     comicsLibrary.parseIssues(res);
 });
+app.post('/api/issue/:issue/updateComic', function (req, res) {
+    comicsLibrary.updateIssueComicId(res, +req.params.issue, parseInt(req.body.comicId));
+});
 app.get('/api/read/:issue', function (req, res) {
     comicsLibrary.read(res, req.params.issue);
 });
