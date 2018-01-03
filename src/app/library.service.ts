@@ -32,7 +32,7 @@ export class LibraryService {
 
   parseComics(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Parsing comics", "pending...");
-    this.http.get('/parseComics').subscribe(res => {
+    this.http.get('/api/comics/parse').subscribe(res => {
       this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing comics", "complete", { timeOut: 2000 });
@@ -40,7 +40,7 @@ export class LibraryService {
   }
   parseIssues(notificationsService: NotificationsService) {
     let notif = notificationsService.info("Parsing issues", "pending...");
-    this.http.get('/parseIssues').subscribe(res => {
+    this.http.get('/api/issues/parse').subscribe(res => {
       this.comics = res.json();
       notificationsService.remove(notif.id);
       notificationsService.success("Parsing issues", "complete", { timeOut: 2000 });

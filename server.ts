@@ -41,15 +41,12 @@ app.post('/saveConfig', function (req, res) {
     comicsLibrary.saveConfig(req.body);
     res.json(comicsLibrary.config);
 });
-app.get('/parseComics', function (req, res) {
-    comicsLibrary.parseComics(res);
-});
-app.get('/parseIssues', function (req, res) {
-    comicsLibrary.parseIssues(res);
-});
 
 app.get('/api/comics', function (req, res) {
     comicsLibrary.getComics(res);
+});
+app.get('/api/comics/parse', function (req, res) {
+    comicsLibrary.parseComics(res);
 });
 app.get('/api/comics/updateInfos', function (req, res) {
     comicsLibrary.updateLibraryInfos(res);
@@ -65,6 +62,9 @@ app.get('/api/comic/:comic/updateInfos', function (req, res) {
 });
 app.post('/api/comic/:comic/updateComicVineId', function (req, res) {
     comicsLibrary.updateComicVineId(res, +req.params.comic, parseInt(req.body.comicVineId));
+});
+app.get('/api/issues/parse', function (req, res) {
+    comicsLibrary.parseIssues(res);
 });
 app.get('/api/read/:issue', function (req, res) {
     comicsLibrary.read(res, req.params.issue);
