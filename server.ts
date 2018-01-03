@@ -47,10 +47,6 @@ app.get('/parseComics', function (req, res) {
 app.get('/parseIssues', function (req, res) {
     comicsLibrary.parseIssues(res);
 });
-app.get('/removeDuplicateIssues', function (req, res) {
-    comicsLibrary.removeDuplicateIssues();
-    res.json(comicsLibrary.comics);
-});
 
 app.get('/api/comics', function (req, res) {
     comicsLibrary.getComics(res);

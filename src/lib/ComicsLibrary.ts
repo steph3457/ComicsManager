@@ -6,12 +6,18 @@ import { Comic } from '../entity/Comic';
 import { createConnection, ConnectionOptions, Connection } from "typeorm";
 import { Publisher } from '../entity/Publisher';
 import { ReadingStatus } from '../entity/ReadingStatus';
+import { Repository } from 'typeorm/repository/Repository';
 
 export class ComicsLibrary {
     private jsonfile = require('jsonfile');
     private configFileName = 'config.json';
     config: Config;
     private connection: Connection;
+    private comicRepository: Repository<Comic>;
+    private issueRepository: Repository<Issue>;
+    private readingStatusRepository: Repository<ReadingStatus>;
+    private unclassifiedComic: Comic;
+
 
     //depracated
     private comicsLibraryFileName = 'comicsLibrary.json';
@@ -28,6 +34,19 @@ export class ComicsLibrary {
     }
     async openConnection() {
         this.connection = await createConnection();
+        this.comicRepository = this.connection.getRepository(Comic);
+        this.issueRepository = this.connection.getRepository(Issue);
+        this.readingStatusRepository = this.connection.getRepository(ReadingStatus);
+
+        let comic: Comic = await this.comicRepository.findOne({ where: { title: "__unclassified__" }, relations: ["issues"] });
+        if (!comic) {
+            comic = new Comic(null);
+            comic.title = "__unclassified__";
+            await this.comicRepository.save(comic);
+            console.log("unclassified comic doesn't exists, creating...");
+        }
+        console.dir(comic);
+        this.unclassifiedComic = comic;
     }
 
     //depracated
@@ -48,17 +67,12 @@ export class ComicsLibrary {
         });
     }
 
-    removeDuplicateIssues() {
-        for (var comic in this.comics) {
-            this.comics[comic].removeDuplicateIssues();
-        }
-        //this.saveLibrary();
-    }
-    private analyseComicsFolderName(folderName: string) {
-        if (this.comics[folderName]) {
+    private async analyseComicsFolderName(folderName: string) {
+        let comic: Comic = await this.comicRepository.findOne({ folder_name: folderName });
+        if (comic) {
             return;
         }
-        var comic: Comic = new Comic(null);
+        comic = new Comic(null);
         comic.folder_name = folderName;
         var folderNameSplitted = folderName.match(/(.*)\(([0-9]{4})\)$/)
         if (folderNameSplitted && folderNameSplitted.length === 3) {
@@ -68,119 +82,130 @@ export class ComicsLibrary {
         } else {
             comic.title = folderName;
         };
-        this.comics[folderName] = comic;
+        await this.comicRepository.save(comic);
     }
-    parseComics(res) {
+    async parseComics(res) {
         const fs = require('fs');
-
-        function response(err) {
-            if (err) {
-                console.log(err);
+        let libraryPath = this.config.comicsPath;
+        let comicList = fs.readdirSync(libraryPath);
+        for (let index in comicList) {
+            let comicFolder = comicList[index];
+            let comicPath: string = path.resolve(libraryPath, comicFolder);
+            let comicStat = fs.statSync(comicPath);
+            if (comicStat && comicStat.isDirectory()) {
+                await this.analyseComicsFolderName(comicFolder);
             }
-            this.saveLibrary();
-            res.json(this.comics);
         }
-        function parseFile(element, callback) {
-            var file: string = path.resolve(comicsPath, element);
-            fs.stat(file, (function (err, stat) {
-                if (err) {
-                    callback(err);
-                    return;
-                }
-                if (stat && stat.isDirectory()) {
-                    this.analyseComicsFolderName(element);
-                }
-                callback();
-            }).bind(this))
-        }
-
-        var comicsPath = this.config.comicsPath;
-        fs.readdir(comicsPath, ((err, list) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            async.each(list, parseFile.bind(this), response.bind(this));
-        }).bind(this))
+        this.getComics(res);
     }
-    parseIssues(res) {
-        var comicsPath = this.config.comicsPath;
-        function response(err) {
-            if (err) {
-                console.log(err);
+
+    private async analyseIssuePath(issuePath: string) {
+
+        let fileInfos = path.parse(issuePath);
+
+        if (fileInfos.ext !== ".cbr" && fileInfos.ext !== ".cbz") {
+            return;
+        }
+
+        let issue: Issue = await this.issueRepository.findOne({ file_name: fileInfos.base });
+        if (issue) {
+            return;
+        }
+
+        console.log("new issue found : " + issuePath);
+        issue = new Issue(null);
+        issue.folder_name = fileInfos.dir;
+        issue.file_name = fileInfos.base;
+        issue.possessed = true;
+
+        let issueNameSplitted = issue.file_name.match(
+            /(.*?)([0-9.]{2,}).*\(([0-9]{4})\).*/
+        );
+        if (issueNameSplitted && issueNameSplitted.length === 4) {
+            issue.title = issueNameSplitted[1].replace(/_/g, " ");
+            issue.number = parseFloat(issueNameSplitted[2]);
+            issue.year = issueNameSplitted[3];
+        } else {
+            issueNameSplitted = issue.file_name.match(/(.*) #([0-9]*).*/);
+            if (issueNameSplitted && issueNameSplitted.length === 3) {
+                issue.title = issueNameSplitted[1].replace(/_/g, " ");
+                issue.number = parseFloat(issueNameSplitted[2]);
             }
-            this.saveLibrary();
-            res.json(this.comics);
         }
-        function parseIssues(comic: Comic, callback) {
-            comic.parseIssues(comicsPath, callback);
+        if (issue.file_name.indexOf("Annual") > 0) {
+            issue.annual = true;
         }
-        async.each(this.comics, parseIssues, response.bind(this));
+        this.unclassifiedComic.issues.push(issue);
+    }
+    async parseIssues(res) {
+        let comicsPath = this.config.comicsPath;
+        let readdir = require("recursive-readdir");
+        let issueList = await readdir(comicsPath, ["._*"]);
+        for (let index in issueList) {
+            let IssuePath = issueList[index];
+            await this.analyseIssuePath(IssuePath);
+        }
+        await this.comicRepository.save(this.unclassifiedComic);
+        this.getComics(res);
     }
 
     async getComics(res) {
-        let comicRepository = this.connection.getRepository(Comic);
-        let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comics = await this.comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
         comics.forEach((comic: Comic) => comic.updateCount());
         res.json(comics);
     }
 
     async getComic(res, comicId: number) {
-        let comicRepository = this.connection.getRepository(Comic);
-        let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
         res.json(comic);
     }
 
     async findExactMapping(res) {
-        let comicRepository = this.connection.getRepository(Comic);
-        let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comics = await this.comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
         let config = this.config;
         for (let comicId in comics) {
             let comic = comics[comicId];
             if (!comic.comicVineId) {
                 async function callback(error, found) {
                     if (found)
-                        await comicRepository.save(comic);
+                        await this.comicRepository.save(comic);
                 }
                 await comic.findExactMapping(config, callback);
             }
         }
-        res.json(comics);
+        this.getComics(res);
     }
 
     async updateLibraryInfos(res) {
-        let comicRepository = this.connection.getRepository(Comic);
-        let comics = await comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comics = await this.comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
         let config = this.config;
         for (let comicId in comics) {
             let comic = comics[comicId];
             if (!comic.finished) {
                 async function callback(error) {
-                    await comicRepository.save(comic);
+                    await this.comicRepository.save(comic);
                 }
                 await comic.updateInfos(config, callback);
             }
         }
         if (res) {
-            res.json(comics);
+            this.getComics(res);
         }
     }
 
     async updateComicInfos(res, comicId: number) {
-        let comicRepository = this.connection.getRepository(Comic);
-        let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
         async function callback(error) {
-            await comicRepository.save(comic);
+            await this.comicRepository.save(comic);
             res.json(comic);
         }
         comic.updateInfos(this.config, callback);
     }
 
     async updateComicVineId(res, comicId: number, comicVineId: number) {
-        let comicRepository = this.connection.getRepository(Comic);
-        let comic: Comic = await comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
         async function callback(error) {
-            await comicRepository.save(comic);
+            await this.comicRepository.save(comic);
             res.json(comic);
         }
         if (comic && comicVineId && comic.comicVineId !== comicVineId) {
@@ -192,16 +217,14 @@ export class ComicsLibrary {
     }
 
     async read(res, issueId: number) {
-        let issueRepository = this.connection.getRepository(Issue);
-        let issue: Issue = await issueRepository.findOneById(issueId);
+        let issue: Issue = await this.issueRepository.findOneById(issueId);
         if (issue) {
             issue.readFile(this.config, res);
         }
     }
 
     updateReadingStatus(readingStatus: ReadingStatus) {
-        let readingStatusRepository = this.connection.getRepository(ReadingStatus);
-        readingStatusRepository.save(readingStatus);
+        this.readingStatusRepository.save(readingStatus);
     }
 
 }
