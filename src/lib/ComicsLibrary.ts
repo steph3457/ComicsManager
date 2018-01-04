@@ -1,31 +1,31 @@
-import * as path from 'path';
-import * as async from 'async';
-import { Issue } from '../entity/Issue';
-import { Config } from './Config';
-import { Comic } from '../entity/Comic';
+import * as path from "path";
+import * as async from "async";
+import { Issue } from "../entity/Issue";
+import { Config } from "./Config";
+import { Comic } from "../entity/Comic";
 import { createConnection, ConnectionOptions, Connection } from "typeorm";
-import { Publisher } from '../entity/Publisher';
-import { ReadingStatus } from '../entity/ReadingStatus';
-import { Repository } from 'typeorm/repository/Repository';
+import { Publisher } from "../entity/Publisher";
+import { ReadingStatus } from "../entity/ReadingStatus";
+import { Repository } from "typeorm/repository/Repository";
 
 export class ComicsLibrary {
-    private jsonfile = require('jsonfile');
-    private configFileName = 'config.json';
+    private jsonfile = require("jsonfile");
+    private configFileName = "config.json";
     config: Config;
     private connection: Connection;
     private comicRepository: Repository<Comic>;
     private issueRepository: Repository<Issue>;
     private readingStatusRepository: Repository<ReadingStatus>;
-    private unclassifiedComic: Comic;
 
-
-    //depracated
-    private comicsLibraryFileName = 'comicsLibrary.json';
+    // depracated
+    private comicsLibraryFileName = "comicsLibrary.json";
     comics: Comic[] = [];
     //
 
     constructor(fromJson: boolean) {
-        this.config = new Config(this.jsonfile.readFileSync(this.configFileName, { throws: false }));
+        this.config = new Config(
+            this.jsonfile.readFileSync(this.configFileName, { throws: false })
+        );
         if (fromJson) {
             this.loadLibraryFromJson();
         } else {
@@ -36,23 +36,18 @@ export class ComicsLibrary {
         this.connection = await createConnection();
         this.comicRepository = this.connection.getRepository(Comic);
         this.issueRepository = this.connection.getRepository(Issue);
-        this.readingStatusRepository = this.connection.getRepository(ReadingStatus);
-
-        let comic: Comic = await this.comicRepository.findOne({ where: { title: "__unclassified__" }, relations: ["issues"] });
-        if (!comic) {
-            comic = new Comic(null);
-            comic.title = "__unclassified__";
-            await this.comicRepository.save(comic);
-            console.log("unclassified comic doesn't exists, creating...");
-        }
-        console.dir(comic);
-        this.unclassifiedComic = comic;
+        this.readingStatusRepository = this.connection.getRepository(
+            ReadingStatus
+        );
     }
 
-    //depracated
+    // depracated
     loadLibraryFromJson() {
         this.comics = [];
-        const comicsLibrary = this.jsonfile.readFileSync(this.comicsLibraryFileName, { throws: false });
+        const comicsLibrary = this.jsonfile.readFileSync(
+            this.comicsLibraryFileName,
+            { throws: false }
+        );
         for (const comic in comicsLibrary) {
             this.comics[comic] = new Comic(comicsLibrary[comic]);
         }
@@ -68,30 +63,31 @@ export class ComicsLibrary {
     }
 
     private async analyseComicsFolderName(folderName: string) {
-        let comic: Comic = await this.comicRepository.findOne({ folder_name: folderName });
+        let comic: Comic = await this.comicRepository.findOne({
+            folder_name: folderName
+        });
         if (comic) {
             return;
         }
         comic = new Comic(null);
         comic.folder_name = folderName;
-        var folderNameSplitted = folderName.match(/(.*)\(([0-9]{4})\)$/)
+        const folderNameSplitted = folderName.match(/(.*)\(([0-9]{4})\)$/);
         if (folderNameSplitted && folderNameSplitted.length === 3) {
-            comic.title = folderNameSplitted[1].replace(/_/g, ' ');
+            comic.title = folderNameSplitted[1].replace(/_/g, " ");
             comic.year = folderNameSplitted[2];
-
         } else {
             comic.title = folderName;
-        };
+        }
         await this.comicRepository.save(comic);
     }
     async parseComics(res) {
-        const fs = require('fs');
-        let libraryPath = this.config.comicsPath;
-        let comicList = fs.readdirSync(libraryPath);
-        for (let index in comicList) {
-            let comicFolder = comicList[index];
-            let comicPath: string = path.resolve(libraryPath, comicFolder);
-            let comicStat = fs.statSync(comicPath);
+        const fs = require("fs");
+        const libraryPath = this.config.comicsPath;
+        const comicList = fs.readdirSync(libraryPath);
+        for (const index in comicList) {
+            const comicFolder = comicList[index];
+            const comicPath: string = path.resolve(libraryPath, comicFolder);
+            const comicStat = fs.statSync(comicPath);
             if (comicStat && comicStat.isDirectory()) {
                 await this.analyseComicsFolderName(comicFolder);
             }
@@ -99,15 +95,16 @@ export class ComicsLibrary {
         this.getComics(res);
     }
 
-    private async analyseIssuePath(issuePath: string) {
-
-        let fileInfos = path.parse(issuePath);
+    private async analyseIssuePath(comic: Comic, issuePath: string) {
+        const fileInfos = path.parse(issuePath);
 
         if (fileInfos.ext !== ".cbr" && fileInfos.ext !== ".cbz") {
             return;
         }
 
-        let issue: Issue = await this.issueRepository.findOne({ file_name: fileInfos.base });
+        let issue: Issue = await this.issueRepository.findOne({
+            file_name: fileInfos.base
+        });
         if (issue) {
             return;
         }
@@ -135,40 +132,56 @@ export class ComicsLibrary {
         if (issue.file_name.indexOf("Annual") > 0) {
             issue.annual = true;
         }
-        this.unclassifiedComic.issues.push(issue);
+        comic.issues.push(issue);
     }
     async parseIssues(res) {
-        let comicsPath = this.config.comicsPath;
-        let readdir = require("recursive-readdir");
-        let issueList = await readdir(comicsPath, ["._*"]);
-        for (let index in issueList) {
-            let IssuePath = issueList[index];
-            await this.analyseIssuePath(IssuePath);
+        const comics = await this.comicRepository.find({
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
+        for (const comicIndex in comics) {
+            const comic = comics[comicIndex];
+            if (!comic.finished && comic.folder_name) {
+                const comicsPath = path.resolve(
+                    this.config.comicsPath,
+                    comic.folder_name
+                );
+                const readdir = require("recursive-readdir");
+                const issueList = await readdir(comicsPath, ["._*"]);
+                for (const index in issueList) {
+                    const IssuePath = issueList[index];
+                    await this.analyseIssuePath(comic, IssuePath);
+                }
+                await this.comicRepository.save(comic);
+            }
         }
-        await this.comicRepository.save(this.unclassifiedComic);
         this.getComics(res);
     }
 
     async getComics(res) {
-        let comics = await this.comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        const comics = await this.comicRepository.find({
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         comics.forEach((comic: Comic) => comic.updateCount());
         res.json(comics);
     }
 
     async getComic(res, comicId: number) {
-        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        const comic: Comic = await this.comicRepository.findOneById(comicId, {
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         res.json(comic);
     }
 
     async findExactMapping(res) {
-        let comics = await this.comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        const comics = await this.comicRepository.find({
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         let config = this.config;
         for (let comicId in comics) {
             let comic = comics[comicId];
             if (!comic.comicVineId) {
                 async function callback(error, found) {
-                    if (found)
-                        await this.comicRepository.save(comic);
+                    if (found) await this.comicRepository.save(comic);
                 }
                 await comic.findExactMapping(config, callback);
             }
@@ -177,7 +190,9 @@ export class ComicsLibrary {
     }
 
     async updateLibraryInfos(res) {
-        let comics = await this.comicRepository.find({ relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comics = await this.comicRepository.find({
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         let config = this.config;
         for (let comicId in comics) {
             let comic = comics[comicId];
@@ -194,7 +209,9 @@ export class ComicsLibrary {
     }
 
     async updateComicInfos(res, comicId: number) {
-        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comic: Comic = await this.comicRepository.findOneById(comicId, {
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         let that = this;
         async function callback(error) {
             await that.comicRepository.save(comic);
@@ -204,7 +221,9 @@ export class ComicsLibrary {
     }
 
     async updateComicVineId(res, comicId: number, comicVineId: number) {
-        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comic: Comic = await this.comicRepository.findOneById(comicId, {
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         let that = this;
         async function callback(error) {
             await that.comicRepository.save(comic);
@@ -218,7 +237,9 @@ export class ComicsLibrary {
         }
     }
     async updateIssueComicId(res, issueId: number, comicId: number) {
-        let issue: Issue = await this.issueRepository.findOneById(issueId, { relations: ["comic"] });
+        let issue: Issue = await this.issueRepository.findOneById(issueId, {
+            relations: ["comic"]
+        });
         if (issue.comic.id === comicId) {
             res.json({ result: "no change found" });
             return;
@@ -227,7 +248,9 @@ export class ComicsLibrary {
             res.json({ result: "don't have the issue" });
             return;
         }
-        let comic: Comic = await this.comicRepository.findOneById(comicId, { relations: ["issues", "issues.readingStatus", "publisher"] });
+        let comic: Comic = await this.comicRepository.findOneById(comicId, {
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         for (let index in comic.issues) {
             let comicIssue = comic.issues[index];
             if (issue.number === comicIssue.number) {
@@ -240,12 +263,12 @@ export class ComicsLibrary {
                 comicIssue.possessed = true;
                 this.issueRepository.save(comicIssue);
                 this.issueRepository.deleteById(issueId);
-                res.json({ result: "replaced missing issue" })
+                res.json({ result: "replaced missing issue" });
                 return;
             }
         }
         this.issueRepository.updateById(issueId, { comic: comic });
-        res.json({ result: "issue added in the comic" })
+        res.json({ result: "issue added in the comic" });
     }
 
     async read(res, issueId: number) {
@@ -258,5 +281,4 @@ export class ComicsLibrary {
     updateReadingStatus(readingStatus: ReadingStatus) {
         this.readingStatusRepository.save(readingStatus);
     }
-
 }

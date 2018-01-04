@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    OneToMany,
+    ManyToOne
+} from "typeorm";
 import * as path from "path";
 import { Config } from "../lib/Config";
 import * as request from "request";
@@ -7,8 +13,7 @@ import { Issue } from "./Issue";
 
 @Entity()
 export class Comic {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn() id: number;
     @Column({ default: "", unique: true })
     folder_name: string = "";
     @Column({ default: "" })
@@ -82,9 +87,11 @@ export class Comic {
         }
         this.count_of_missing_issues = this.count_of_issues - possessed;
         this.count_of_unread_issues = this.count_of_issues - read;
+        this.issues = [];
+        this.description = "";
     }
 
-    //Server part
+    // Server part
     update(comicVineJson) {
         this.count_of_issues = comicVineJson.issues
             ? comicVineJson.issues.length
@@ -94,7 +101,11 @@ export class Comic {
         }
         this.api_detail_url = comicVineJson.api_detail_url;
         this.site_detail_url = comicVineJson.site_detail_url;
-        if (this.publisher && comicVineJson.publisher && this.publisher.comicVineId !== comicVineJson.publisher.id) {
+        if (
+            this.publisher &&
+            comicVineJson.publisher &&
+            this.publisher.comicVineId !== comicVineJson.publisher.id
+        ) {
             this.publisher = new Publisher(comicVineJson.publisher);
         }
         this.comicVineId = comicVineJson.id;
@@ -128,7 +139,7 @@ export class Comic {
             return;
         }
         let page = 0;
-        var url =
+        const url =
             "http://comicvine.gamespot.com/api/search/?api_key=" +
             config.comicVineAPI +
             "&limit=100" +
@@ -137,11 +148,11 @@ export class Comic {
             "&query=" +
             encodeURI(this.title) +
             "&resources=volume&format=json";
-        var headers = {
+        const headers = {
             "User-Agent": "Super Agent/0.0.1",
             "Content-Type": "application/x-www-form-urlencoded"
         };
-        var options = {
+        const options = {
             url: url,
             method: "GET",
             headers: headers
@@ -216,7 +227,7 @@ export class Comic {
         if (!this.comicVineId) {
             console.log(
                 "unable to find extra information in comic vine for " +
-                this.folder_name
+                    this.folder_name
             );
             callback(null);
             return;
