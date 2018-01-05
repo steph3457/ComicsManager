@@ -39,19 +39,8 @@ export class ComicsLibrary {
         this.readingStatusRepository = this.connection.getRepository(
             ReadingStatus
         );
-        let comic: Comic = await this.comicRepository.findOne({ where: { title: "__unclassified__" }, relations: ["issues", "issues.readingStatus"] });
-        if (comic) {
-            console.log("unclassified comic found, deleting...");
-            for (const issueIndex in comic.issues) {
-                let issue = comic.issues[issueIndex];
-                await this.issueRepository.deleteById(issue.id);
-                await this.readingStatusRepository.deleteById(issue.readingStatus.id);
-            }
-            await this.comicRepository.deleteById(comic.id);
-
-            console.log("unclassified comic deleted");
-        }
     }
+
 
     // depracated
     loadLibraryFromJson() {
@@ -144,7 +133,8 @@ export class ComicsLibrary {
         if (issue.file_name.indexOf("Annual") > 0) {
             issue.annual = true;
         }
-        comic.issues.push(issue);
+        await this.issueRepository.save(issue);
+        await this.issueRepository.updateById(issue.id, { comic: comic });
     }
     async parseIssues(res) {
         const comics = await this.comicRepository.find({
@@ -163,7 +153,6 @@ export class ComicsLibrary {
                     const IssuePath = issueList[index];
                     await this.analyseIssuePath(comic, IssuePath);
                 }
-                await this.comicRepository.save(comic);
             }
         }
         this.getComics(res);
