@@ -39,6 +39,18 @@ export class ComicsLibrary {
         this.readingStatusRepository = this.connection.getRepository(
             ReadingStatus
         );
+        let comic: Comic = await this.comicRepository.findOne({ where: { title: "__unclassified__" }, relations: ["issues", "issues.readingStatus"] });
+        if (comic) {
+            console.log("unclassified comic found, deleting...");
+            for (const issueIndex in comic.issues) {
+                let issue = comic.issues[issueIndex];
+                await this.issueRepository.deleteById(issue.id);
+                await this.readingStatusRepository.deleteById(issue.readingStatus.id);
+            }
+            await this.comicRepository.deleteById(comic.id);
+
+            console.log("unclassified comic deleted");
+        }
     }
 
     // depracated
@@ -180,8 +192,9 @@ export class ComicsLibrary {
         for (let comicId in comics) {
             let comic = comics[comicId];
             if (!comic.comicVineId) {
+                let that = this;
                 async function callback(error, found) {
-                    if (found) await this.comicRepository.save(comic);
+                    if (found) await that.comicRepository.save(comic);
                 }
                 await comic.findExactMapping(config, callback);
             }
@@ -197,8 +210,9 @@ export class ComicsLibrary {
         for (let comicId in comics) {
             let comic = comics[comicId];
             if (!comic.finished) {
+                let that = this;
                 async function callback(error) {
-                    await this.comicRepository.save(comic);
+                    await that.comicRepository.save(comic);
                 }
                 await comic.updateInfos(config, callback);
             }
