@@ -239,6 +239,11 @@ export class ComicsLibrary {
             res.json(comic);
         }
     }
+    async toggleComicFinished(res, comicId: number) {
+        let comic: Comic = await this.comicRepository.findOneById(comicId);
+        await this.comicRepository.updateById(comicId, { finished: !comic.finished });
+        res.json(comic);
+    }
     async updateIssueComicId(res, issueId: number, comicId: number) {
         let issue: Issue = await this.issueRepository.findOneById(issueId, {
             relations: ["comic"]
@@ -285,3 +290,4 @@ export class ComicsLibrary {
         this.readingStatusRepository.save(readingStatus);
     }
 }
+

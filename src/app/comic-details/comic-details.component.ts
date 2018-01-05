@@ -74,6 +74,14 @@ export class ComicDetailsComponent implements OnInit {
       });
     }
   }
+  toggleFinished() {
+    let notif = this.notificationsService.info("Update comic finished", "pending...");
+    this.http.get('/api/comic/' + this.comic.id + '/toggleFinished').subscribe(res => {
+      this.comic.finished = !this.comic.finished;
+      this.notificationsService.remove(notif.id);
+      this.notificationsService.success("Update comic finished", "complete", { timeOut: 2000 });
+    });
+  }
 
   ngOnInit() {
 

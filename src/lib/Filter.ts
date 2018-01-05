@@ -20,10 +20,15 @@ export class Filter {
                 return this.matchMissing(comic);
             case "unmapped":
                 return this.matchunmapped(comic);
+            case "inprogress":
+                return this.matchInProgress(comic);
             default:
                 return true;
         }
 
+    }
+    private matchInProgress(comic: Comic): boolean {
+        return !comic.finished;
     }
     private matchUnread(comic: Comic): boolean {
         return comic.count_of_unread_issues > 0;
