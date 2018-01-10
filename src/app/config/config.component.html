@@ -35,4 +35,12 @@
       </li>
     </ul>
   </div>
+  <h3>Create Comic</h3>
+  <div>Comic title:
+    <input name="comicTitle" [(ngModel)]="comicTitle" type="text" placeholder="Comic name">
+  </div>
+  <div>Comic year:
+    <input name="comicYear" [(ngModel)]="comicYear" type="text" placeholder="Comic year">
+  </div>
+  <button (click)="createComic()">Create Comic</button>
 </div>

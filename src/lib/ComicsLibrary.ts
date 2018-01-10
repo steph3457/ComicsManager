@@ -41,7 +41,6 @@ export class ComicsLibrary {
         );
     }
 
-
     // depracated
     loadLibraryFromJson() {
         this.comics = [];
@@ -166,6 +165,20 @@ export class ComicsLibrary {
         res.json(comics);
     }
 
+    async createComic(res, comicTitle: string, comicYear: string) {
+        let comic = new Comic(null);
+        comic.title = comicTitle;
+        comic.year = comicYear;
+        comic.folder_name = comicTitle + " (" + comicYear + ")";
+        console.log(comic.folder_name);
+        let that = this;
+        async function callback(error, found) {
+            await that.comicRepository.save(comic);
+        }
+        await comic.findExactMapping(this.config, 0, callback);
+        this.getComics(res);
+    }
+
     async getComic(res, comicId: number) {
         const comic: Comic = await this.comicRepository.findOneById(comicId, {
             relations: ["issues", "issues.readingStatus", "publisher"]
@@ -185,7 +198,7 @@ export class ComicsLibrary {
                 async function callback(error, found) {
                     if (found) await that.comicRepository.save(comic);
                 }
-                await comic.findExactMapping(config, callback);
+                await comic.findExactMapping(config, 0, callback);
             }
         }
         this.getComics(res);
@@ -241,7 +254,9 @@ export class ComicsLibrary {
     }
     async toggleComicFinished(res, comicId: number) {
         let comic: Comic = await this.comicRepository.findOneById(comicId);
-        await this.comicRepository.updateById(comicId, { finished: !comic.finished });
+        await this.comicRepository.updateById(comicId, {
+            finished: !comic.finished
+        });
         res.json(comic);
     }
     async updateIssueComicId(res, issueId: number, comicId: number) {
@@ -290,4 +305,3 @@ export class ComicsLibrary {
         this.readingStatusRepository.save(readingStatus);
     }
 }
-

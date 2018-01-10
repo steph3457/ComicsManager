@@ -133,12 +133,11 @@ export class Comic {
         issue.updateFromComicVine(comicVineJson);
     }
 
-    findExactMapping(config: Config, callback) {
+    findExactMapping(config: Config, page, callback) {
         if (this.comicVineId) {
             console.log("Mapping already exist for " + this.folder_name);
             return;
         }
-        let page = 0;
         const url =
             "http://comicvine.gamespot.com/api/search/?api_key=" +
             config.comicVineAPI +
@@ -192,25 +191,8 @@ export class Comic {
                     }
                 }
                 if (!found && nextPage) {
-                    var url =
-                        "http://comicvine.gamespot.com/api/search/?api_key=" +
-                        config.comicVineAPI +
-                        "&limit=100" +
-                        "&page=" +
-                        page +
-                        "query=" +
-                        this.title +
-                        "&resources=volume&format=json";
-                    var headers = {
-                        "User-Agent": "Super Agent/0.0.1",
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    };
-                    var options = {
-                        url: url,
-                        method: "GET",
-                        headers: headers
-                    };
-                    request(options, callback);
+                    console.log("not found get next page");
+                    this.findExactMapping(config, page, callback);
                 } else if (!found) {
                     console.log("Not Found : " + this.title);
                 }
