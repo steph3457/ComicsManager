@@ -175,7 +175,7 @@ export class ComicsLibrary {
         async function callback(error, found) {
             await that.comicRepository.save(comic);
         }
-        await comic.findExactMapping(this.config, 0, callback);
+        await comic.findExactMapping(this.config, callback);
         this.getComics(res);
     }
 
@@ -198,7 +198,7 @@ export class ComicsLibrary {
                 async function callback(error, found) {
                     if (found) await that.comicRepository.save(comic);
                 }
-                await comic.findExactMapping(config, 0, callback);
+                await comic.findExactMapping(config, callback);
             }
         }
         this.getComics(res);

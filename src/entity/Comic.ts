@@ -133,7 +133,7 @@ export class Comic {
         issue.updateFromComicVine(comicVineJson);
     }
 
-    findExactMapping(config: Config, page, callback) {
+    findExactMapping(config: Config, callback, page = 1) {
         if (this.comicVineId) {
             console.log("Mapping already exist for " + this.folder_name);
             return;
@@ -164,12 +164,10 @@ export class Comic {
                 var body = JSON.parse(body);
                 var found = false;
                 var nextPage = false;
-                page++;
                 if (body.number_of_total_results > page * body.limit) {
                     nextPage = true;
                 }
                 var results = body.results;
-
                 for (var i = 0; i < results.length; i++) {
                     var comic = results[i];
                     var comicName = comic.name
@@ -192,7 +190,7 @@ export class Comic {
                 }
                 if (!found && nextPage) {
                     console.log("not found get next page");
-                    this.findExactMapping(config, page, callback);
+                    this.findExactMapping(config, page++, callback);
                 } else if (!found) {
                     console.log("Not Found : " + this.title);
                 }
