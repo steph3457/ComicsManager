@@ -174,9 +174,9 @@ export class ComicsLibrary {
         let that = this;
         async function callback(error, found) {
             await that.comicRepository.save(comic);
+            this.getComics(res);
         }
         await comic.findExactMapping(this.config, callback);
-        this.getComics(res);
     }
 
     async getComic(res, comicId: number) {

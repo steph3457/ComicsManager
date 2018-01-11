@@ -3,14 +3,15 @@ import { Comic } from "./Comic";
 export class Filter {
     search: string = "";
     restriction: string = "unread";
-    constructor() { }
+    constructor() {}
 
     public match(comic: Comic): boolean {
-        return this.matchRestriction(comic) &&
-            this.matchSearch(comic);
+        return this.matchRestriction(comic) && this.matchSearch(comic);
     }
     private matchSearch(comic: Comic): boolean {
-        return comic.title.toLowerCase().indexOf(this.search.toLowerCase()) != -1;
+        return (
+            comic.title.toLowerCase().indexOf(this.search.toLowerCase()) !== -1
+        );
     }
     private matchRestriction(comic: Comic): boolean {
         switch (this.restriction) {
@@ -25,7 +26,6 @@ export class Filter {
             default:
                 return true;
         }
-
     }
     private matchInProgress(comic: Comic): boolean {
         return !comic.finished;

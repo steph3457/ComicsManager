@@ -44,7 +44,7 @@
         <td>{{issue.number}}</td>
         <td [hidden]="!edit">
           <select [ngModel]="comic.id" (change)="libraryService.updateIssueComic($event.target.value, issue.id, notificationsService)">
-            <option *ngFor="let c of libraryService.comics" [value]="c.id">{{c.title}} ({{c.year}})</option>
+            <option *ngFor="let c of libraryService.getInProgressComics()" [value]="c.id">{{c.title}} ({{c.year}})</option>
           </select>
         </td>
         <td class="clickable" (click)="read(issue)">{{issue.file_name}}</td>
