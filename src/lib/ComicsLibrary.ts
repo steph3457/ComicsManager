@@ -264,11 +264,11 @@ export class ComicsLibrary {
             relations: ["comic"]
         });
         if (issue.comic.id === comicId) {
-            res.json({ result: "no change found" });
+            res.json({ status: "fail", message: "no change found" });
             return;
         }
         if (!issue.possessed) {
-            res.json({ result: "don't have the issue" });
+            res.json({ status: "fail", message: "don't have the issue" });
             return;
         }
         let comic: Comic = await this.comicRepository.findOneById(comicId, {
@@ -278,7 +278,7 @@ export class ComicsLibrary {
             let comicIssue = comic.issues[index];
             if (issue.number === comicIssue.number) {
                 if (comicIssue.file_name) {
-                    res.json({ result: "this issue number already exists" });
+                    res.json({ status: "fail", message: "this issue number already exists" });
                     return;
                 }
                 comicIssue.file_name = issue.file_name;
@@ -286,12 +286,12 @@ export class ComicsLibrary {
                 comicIssue.possessed = true;
                 this.issueRepository.save(comicIssue);
                 this.issueRepository.deleteById(issueId);
-                res.json({ result: "replaced missing issue" });
+                res.json({ status: "success", message: "replaced missing issue" });
                 return;
             }
         }
         this.issueRepository.updateById(issueId, { comic: comic });
-        res.json({ result: "issue added in the comic" });
+        res.json({ status: "success", message: "issue added in the comic" });
     }
 
     async read(res, issueId: number) {

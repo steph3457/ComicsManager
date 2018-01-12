@@ -43,7 +43,7 @@
         </td>
         <td>{{issue.number}}</td>
         <td [hidden]="!edit">
-          <select [ngModel]="comic.id" (change)="libraryService.updateIssueComic($event.target.value, issue.id, notificationsService)">
+          <select [ngModel]="comic.id" (change)="updateIssueComic($event.target.value, issue.id, notificationsService)">
             <option *ngFor="let c of libraryService.getInProgressComics()" [value]="c.id">{{c.title}} ({{c.year}})</option>
           </select>
         </td>

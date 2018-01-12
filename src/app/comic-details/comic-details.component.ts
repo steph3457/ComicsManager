@@ -35,7 +35,7 @@ export class ComicDetailsComponent implements OnInit {
   }
 
   read(issue: Issue) {
-    if (issue.possessed) {
+    if (issue.possessed && !this.edit) {
       this.libraryService.readingStatus = issue.readingStatus;
       this.router.navigate(['/reader', issue.id]);
     }
@@ -81,6 +81,40 @@ export class ComicDetailsComponent implements OnInit {
       this.notificationsService.remove(notif.id);
       this.notificationsService.success("Update comic finished", "complete", { timeOut: 2000 });
     });
+  }
+
+  updateIssueComic(
+    comicId,
+    issueId,
+    notificationsService: NotificationsService
+  ) {
+    let notif = notificationsService.info(
+      "Update issue comic",
+      "pending..."
+    );
+    this.http
+      .post("/api/issue/" + issueId + "/updateComic", {
+        comicId: comicId
+      })
+      .subscribe(res => {
+        notificationsService.remove(notif.id);
+        console.log(res.json());
+        if (res.json().status === "success") {
+          for (let issueIndex in this.comic.issues) {
+            if (this.comic.issues[issueIndex].id === issueId) {
+              delete this.comic.issues[issueIndex];
+            }
+          }
+          notificationsService.success("Update issue comic", res.json().message, {
+            timeOut: 2000
+          });
+        }
+        else {
+          notificationsService.error("Update issue comic", res.json().message, {
+            timeOut: 2000
+          });
+        }
+      });
   }
 
   ngOnInit() {
