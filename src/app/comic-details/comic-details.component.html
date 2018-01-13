@@ -28,6 +28,11 @@
 
 <div class="panel panel-default">
   <div class="table-responsive">
+    <div class="btn-group">
+      <label class="btn btn-primary" [(ngModel)]="comic.filter" btnRadio="unread" uncheckable>Unread</label>
+    </div>
+    <input type="text" id="search" [(ngModel)]="comic.search" placeholder="Filter by name...">
+
     <table class="table table-striped table-hover">
       <thead class="thead-default">
         <th>Image</th>

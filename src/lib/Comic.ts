@@ -17,11 +17,14 @@ export class Comic {
     publisher: Publisher;
     issues: { [name: string]: Issue } = {};
     finished: boolean = false;
+    filter: string = "unread";
+    search: string = "";
+
     issuesComparer: (
         i1: Issue,
         i2: Issue
     ) => number = Issue.IssueNumberComparer;
-    issuesReverse: boolean = true;
+    issuesReverse: boolean = false;
 
     public static ComicTitleComparer(comic1: Comic, comic2: Comic) {
         if (comic1.title && comic2.title) {
@@ -62,7 +65,22 @@ export class Comic {
     getIssues(): Issue[] {
         let issues: Issue[] = [];
         for (const i in this.issues) {
-            issues.push(this.issues[i]);
+            const issue = this.issues[i];
+            let match = true;
+            if (this.filter === "unread") {
+                if (issue.readingStatus.read) {
+                    match = false;
+                }
+            }
+            if (this.search && issue.file_name) {
+                if (issue.file_name.toLowerCase().indexOf(this.search.toLowerCase()) === -1) {
+                    match = false;
+                }
+            }
+            if (match) {
+                issues.push(issue);
+            }
+
         }
         issues = issues.sort(this.issuesComparer);
         if (this.issuesReverse) {
