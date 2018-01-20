@@ -299,6 +299,11 @@ export class ComicsLibrary {
         res.json({ status: "success", message: "issue added in the comic" });
     }
 
+    async deleteIssue(res, issueId: number) {
+        await this.issueRepository.deleteById(issueId);
+        res.json({ status: "success", message: "issue deleted" });
+    }
+
     async read(res, issueId: number) {
         let issue: Issue = await this.issueRepository.findOneById(issueId);
         if (issue) {
