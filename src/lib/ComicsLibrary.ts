@@ -147,10 +147,15 @@ export class ComicsLibrary {
                     comic.folder_name
                 );
                 const readdir = require("recursive-readdir");
-                const issueList = await readdir(comicsPath, ["._*"]);
-                for (const index in issueList) {
-                    const IssuePath = issueList[index];
-                    await this.analyseIssuePath(comic, IssuePath);
+                try {
+                    const issueList = await readdir(comicsPath, ["._*"]);
+                    for (const index in issueList) {
+                        const IssuePath = issueList[index];
+                        await this.analyseIssuePath(comic, IssuePath);
+                    }
+                }
+                catch (e) {
+                    console.log("Unable to parse comic : " + comic.folder_name + " " + e)
                 }
             }
         }
