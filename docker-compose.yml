@@ -8,7 +8,7 @@ services:
       - "3001:3001"
     volumes:
       - ./comics:/comics
-      - ./:/web
+      - ./database.db:/data/database.db
     labels:
       - traefik.backend=comics
       - traefik.frontend.rule=Host:comics.my.domain.com

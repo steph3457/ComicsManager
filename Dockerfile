@@ -3,7 +3,7 @@ FROM node:9-alpine as node
 RUN apk --update --no-progress add unrar bash git
 
 VOLUME ["/comics"]
-VOLUME ["/web"]
+VOLUME ["/data"]
 
 EXPOSE 3001
 
