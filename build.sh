@@ -1,6 +1,6 @@
 #!/bin/bash
 echo build angular...
-ng build --aot --prod
+ng build --aot=false --prod
 echo angular build finished
 echo tsc...
 tsc
