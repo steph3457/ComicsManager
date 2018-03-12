@@ -1,9 +1,11 @@
+import "reflect-metadata";
+
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { HttpModule } from "@angular/http";
-import { CollapseDirective } from "ng2-bootstrap/collapse";
-import { ButtonsModule } from "ng2-bootstrap/buttons";
+import { CollapseDirective } from "ngx-bootstrap/collapse";
+import { ButtonsModule } from "ngx-bootstrap/buttons";
 
 import { AppComponent } from "./app.component";
 import { ReaderComponent } from "./reader/reader.component";
@@ -15,7 +17,9 @@ import { LibraryService } from "./library.service";
 import { routing } from "./app.routes";
 import { ConfigComponent } from "./config/config.component";
 import { SimpleNotificationsModule } from "angular2-notifications";
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+
+import { LocationStrategy, HashLocationStrategy } from "@angular/common";
 
 @NgModule({
     declarations: [
@@ -34,7 +38,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
         SimpleNotificationsModule.forRoot(),
         ButtonsModule.forRoot()
     ],
-    providers: [LibraryService],
+    providers: [
+        LibraryService,
+        { provide: LocationStrategy, useClass: HashLocationStrategy }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {}

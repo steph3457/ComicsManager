@@ -3,8 +3,12 @@
     <h1>Config</h1>
   </div>
   <div class="panel-body">
-    <div>Comics path: <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics"></div>
-    <div>ComicVine API key: <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key"></div>
+    <div>Comics path:
+      <input name="comicsPath" [(ngModel)]="libraryService.config.comicsPath" type="text" placeholder="/Path/to/your/comics">
+    </div>
+    <div>ComicVine API key:
+      <input name="comicVineAPI" [(ngModel)]="libraryService.config.comicVineAPI" type="text" placeholder="Your comic vine API key">
+    </div>
     <div *ngFor="let publisher of libraryService.config.getPublishers()">
       {{publisher.name}}
     </div>
@@ -17,12 +21,26 @@
   </div>
   <div class="panel-body">
     <ul class="nav navbar-nav">
-      <li><a (click)="libraryService.parseComics(notificationsService)">Update comics</a></li>
-      <li><a (click)="libraryService.parseIssues(notificationsService)">Update issues</a></li>
-      <li><a (click)="libraryService.findExactMapping(notificationsService)">Update comics info with Comic Vine API</a></li>
-      <li><a (click)="libraryService.updateComicsInfos(notificationsService)">Update issues info with Comic Vine API</a></li>
-      <li><a (click)="libraryService.saveLibrary(notificationsService)">Save library</a></li>
-      <li><a (click)="libraryService.reloadLibrary(notificationsService)">Reload library</a></li>
+      <li>
+        <a (click)="libraryService.parseComics(notificationsService)">Update comics</a>
+      </li>
+      <li>
+        <a (click)="libraryService.parseIssues(notificationsService)">Update issues</a>
+      </li>
+      <li>
+        <a (click)="libraryService.findExactMapping(notificationsService)">Search unmapped comics in Comic Vine</a>
+      </li>
+      <li>
+        <a (click)="libraryService.updateComicsInfos(notificationsService)">Update issues info with Comic Vine API</a>
+      </li>
     </ul>
   </div>
+  <h3>Create Comic</h3>
+  <div>Comic title:
+    <input name="comicTitle" [(ngModel)]="comicTitle" type="text" placeholder="Comic name">
+  </div>
+  <div>Comic year:
+    <input name="comicYear" [(ngModel)]="comicYear" type="text" placeholder="Comic year">
+  </div>
+  <button (click)="createComic()">Create Comic</button>
 </div>

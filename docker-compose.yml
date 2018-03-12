@@ -3,12 +3,12 @@ version: '3'
 services:
   comics:
     image: comicsmanager:latest
+    build: .
     ports:
-      - "3000:3000"
       - "3001:3001"
     volumes:
       - ./comics:/comics
-      - ./:/web
+      - ./database.db:/data/database.db
     labels:
       - traefik.backend=comics
       - traefik.frontend.rule=Host:comics.my.domain.com

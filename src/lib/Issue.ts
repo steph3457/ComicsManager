@@ -1,6 +1,8 @@
 import { ReadingStatus } from "./ReadingStatus";
 
 export class Issue {
+
+  id: number;
   folder_name: string = "";
   file_name: string = "";
   title: string = "";
@@ -16,6 +18,7 @@ export class Issue {
   date: Date;
   constructor(issue: Issue) {
     if (issue) {
+      this.id = issue.id;
       if (issue.folder_name)
         this.folder_name = issue.folder_name;
       if (issue.file_name)

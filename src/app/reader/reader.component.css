@@ -1,3 +1,19 @@
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: white;
+}
+
+.loading img {
+  display: block;
+  height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 ul {
   list-style-type: none;
 }
