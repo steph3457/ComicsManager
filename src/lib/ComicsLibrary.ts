@@ -166,13 +166,13 @@ export class ComicsLibrary {
         comic.year = comicYear;
         comic.folder_name = comicTitle + " (" + comicYear + ")";
         console.log(comic.folder_name);
-        let that = this;
+        const that = this;
         async function callback(error, found) {
             await that.comicRepository.save(comic);
             that.getComics(res);
         }
         const config = await this.getConfig(null);
-        await comic.findExactMapping(config, callback);
+        comic.findExactMapping(config, callback);
     }
 
     async getComic(res, comicId: number) {
@@ -187,32 +187,34 @@ export class ComicsLibrary {
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
         const config = await this.getConfig(null);
-        for (let comicId in comics) {
-            let comic = comics[comicId];
+        for (const comicId in comics) {
+            const comic = comics[comicId];
             if (!comic.comicVineId) {
-                let that = this;
+                const that = this;
                 async function callback(error, found) {
-                    if (found) await that.comicRepository.save(comic);
+                    if (found) {
+                        await that.comicRepository.save(comic);
+                    }
                 }
-                await comic.findExactMapping(config, callback);
+                comic.findExactMapping(config, callback);
             }
         }
         this.getComics(res);
     }
 
     async updateLibraryInfos(res) {
-        let comics = await this.comicRepository.find({
+        const comics = await this.comicRepository.find({
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
         const config = await this.getConfig(null);
-        for (let comicId in comics) {
+        for (const comicId in comics) {
             const comic = comics[comicId];
             if (!comic.finished) {
                 const that = this;
                 async function callback(error) {
                     await that.comicRepository.save(comic);
                 }
-                await comic.updateInfos(config, callback);
+                comic.updateInfos(config, callback);
             }
         }
         if (res) {
@@ -258,7 +260,7 @@ export class ComicsLibrary {
         res.json(comic);
     }
     async updateIssueComicId(res, issueId: number, comicId: number) {
-        let issue: Issue = await this.issueRepository.findOneById(issueId, {
+        const issue: Issue = await this.issueRepository.findOneById(issueId, {
             relations: ["comic"]
         });
         if (issue.comic.id === comicId) {
@@ -269,7 +271,7 @@ export class ComicsLibrary {
             res.json({ status: "fail", message: "don't have the issue" });
             return;
         }
-        let comic: Comic = await this.comicRepository.findOneById(comicId, {
+        const comic: Comic = await this.comicRepository.findOneById(comicId, {
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
         for (const index in comic.issues) {

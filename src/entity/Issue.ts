@@ -55,8 +55,12 @@ export class Issue {
     date: Date;
     constructor(issue: Issue) {
         if (issue) {
-            if (issue.folder_name) this.folder_name = issue.folder_name;
-            if (issue.file_name) this.file_name = issue.file_name;
+            if (issue.folder_name) {
+                this.folder_name = issue.folder_name;
+            }
+            if (issue.file_name) {
+                this.file_name = issue.file_name;
+            }
             this.title = issue.title;
             this.year = issue.year;
             this.image = issue.image;
@@ -75,7 +79,9 @@ export class Issue {
     }
     updateFromComicVine(comicVineJson) {
         if (comicVineJson) {
-            if (comicVineJson.name) this.title = comicVineJson.name;
+            if (comicVineJson.name) {
+                this.title = comicVineJson.name;
+            }
             this.api_detail_url = comicVineJson.api_detail_url;
             this.site_detail_url = comicVineJson.site_detail_url;
             this.comicVineId = comicVineJson.id;
@@ -86,12 +92,12 @@ export class Issue {
     }
 
     readFile(config: Config, res) {
-        var issuePath = path.resolve(
+        const issuePath = path.resolve(
             config.comicsPath,
             this.folder_name,
             this.file_name
         );
-        var tempPath = path.resolve("./temp", "" + this.id);
+        const tempPath = path.resolve("./temp", "" + this.id);
         const fs = require("fs");
 
         if (!fs.existsSync(tempPath)) {
@@ -99,12 +105,12 @@ export class Issue {
             unzip(issuePath, tempPath, err => {
                 if (err) {
                     console.log("unzip fail, try unrar");
-                    var rar = new Unrar(issuePath);
+                    const rar = new Unrar(issuePath);
                     rar.extract(
                         tempPath,
                         null,
-                        function(err) {
-                            console.log(err);
+                        function(rarError) {
+                            console.log(rarError);
                             this.sendImages(res);
                         }.bind(this)
                     );
@@ -118,11 +124,11 @@ export class Issue {
     }
     sendImages(res) {
         const fs = require("fs");
-        var imageList: string[] = [];
-        var tempPath = path.resolve("./temp", "" + this.id);
+        let imageList: string[] = [];
+        let tempPath = path.resolve("./temp", "" + this.id);
         imageList = fs.readdirSync(tempPath);
         if (imageList.length === 1) {
-            var extraFolder = imageList[0];
+            const extraFolder = imageList[0];
             tempPath = path.resolve(tempPath, extraFolder);
             imageList = fs.readdirSync(tempPath);
             imageList = imageList.map(x => extraFolder + "/" + x);

@@ -148,18 +148,18 @@ export class Comic {
             }
             if (!error && response.statusCode == 200) {
                 body = JSON.parse(body);
-                var found = false;
-                var nextPage = false;
+                let found = false;
+                let nextPage = false;
                 if (body.number_of_total_results > page * body.limit) {
                     nextPage = true;
                 }
-                var results = body.results;
-                for (var i = 0; i < results.length; i++) {
-                    var comic = results[i];
-                    var comicName = comic.name
+                const results = body.results;
+                for (let i = 0; i < results.length; i++) {
+                    const comic = results[i];
+                    const comicName = comic.name
                         .replace(/[\- :()_&,/\\]/g, "")
                         .toLowerCase();
-                    var title = this.title
+                    const title = this.title
                         .replace(/[\- :()_&,/\\]/g, "")
                         .toLowerCase();
 
@@ -202,42 +202,42 @@ export class Comic {
         this.updateIssuesInfos(config, callback);
     }
     private updateComicInfos(config: Config) {
-        var url =
+        const url =
             "http://comicvine.gamespot.com/api/volume/4050-" +
             this.comicVineId +
             "/?api_key=" +
             config.comicVineAPI +
             "&format=json";
-        var headers = {
+        const headers = {
             "User-Agent": "Super Agent/0.0.1",
             "Content-Type": "application/x-www-form-urlencoded"
         };
-        var options = {
+        const options = {
             url: url,
             method: "GET",
             headers: headers
         };
         function callback(error, response, body) {
             if (!error && response.statusCode == 200) {
-                var body = JSON.parse(body);
-                var comic = body.results;
+                body = JSON.parse(body);
+                const comic = body.results;
                 this.update(comic);
             }
         }
         request(options, callback.bind(this));
     }
     private updateIssuesInfos(config: Config, callback) {
-        var url =
+        const url =
             "http://comicvine.gamespot.com/api/issues/?api_key=" +
             config.comicVineAPI +
             "&filter=volume:" +
             this.comicVineId +
             "&format=json";
-        var headers = {
+        const headers = {
             "User-Agent": "Super Agent/0.0.1",
             "Content-Type": "application/x-www-form-urlencoded"
         };
-        var options = {
+        const options = {
             url: url,
             method: "GET",
             headers: headers
@@ -247,9 +247,9 @@ export class Comic {
                 callback(error);
             }
             if (!error && response.statusCode == 200) {
-                var body = JSON.parse(body);
-                var issues = body.results;
-                for (var i in issues) {
+                body = JSON.parse(body);
+                const issues = body.results;
+                for (const i in issues) {
                     this.updateIssueInformation(issues[i]);
                 }
                 callback();

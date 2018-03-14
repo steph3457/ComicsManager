@@ -8,9 +8,8 @@ import * as compression from "compression";
 import { ComicsLibrary } from "./src/lib/ComicsLibrary";
 import * as fs from "fs";
 
-var app = express();
-var comicsLibrary = new ComicsLibrary(false);
-var bodyParser = require("body-parser");
+const app = express();
+const comicsLibrary = new ComicsLibrary(false);
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -68,7 +67,7 @@ app.post("/api/comic/:comic/updateComicVineId", function(req, res) {
     comicsLibrary.updateComicVineId(
         res,
         +req.params.comic,
-        parseInt(req.body.comicVineId)
+        parseInt(req.body.comicVineId, 10)
     );
 });
 app.get("/api/issues/parse", function(req, res) {
@@ -78,7 +77,7 @@ app.post("/api/issue/:issue/updateComic", function(req, res) {
     comicsLibrary.updateIssueComicId(
         res,
         +req.params.issue,
-        parseInt(req.body.comicId)
+        parseInt(req.body.comicId, 10)
     );
 });
 app.delete("/api/issue/:issue", function(req, res) {
