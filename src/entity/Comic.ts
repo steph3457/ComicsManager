@@ -6,10 +6,11 @@ import {
     ManyToOne
 } from "typeorm";
 import * as path from "path";
-import { Config } from "../lib/Config";
+import { Config } from "./Config";
 import * as request from "request";
 import { Publisher } from "./Publisher";
 import { Issue } from "./Issue";
+import { getConnection } from "typeorm";
 
 @Entity()
 export class Comic {
@@ -49,26 +50,7 @@ export class Comic {
     count_of_missing_issues: number = 0;
     count_of_unread_issues: number = 0;
 
-    constructor(comic: Comic) {
-        if (comic) {
-            this.folder_name = comic.folder_name;
-            this.title = comic.title;
-            this.year = comic.year;
-            this.image = comic.image;
-            this.comicVineId = comic.comicVineId;
-            this.count_of_issues = comic.count_of_issues;
-            this.count_of_missing_issues = comic.count_of_missing_issues;
-            this.count_of_unread_issues = comic.count_of_unread_issues;
-            this.description = comic.description;
-            this.api_detail_url = comic.api_detail_url;
-            this.site_detail_url = comic.site_detail_url;
-            this.publisher = new Publisher(comic.publisher);
-            this.finished = comic.finished;
-            for (const issue in comic.issues) {
-                this.issues.push(new Issue(comic.issues[issue]));
-            }
-        }
-    }
+    constructor() {}
 
     updateCount() {
         let possessed = 0;
@@ -92,7 +74,7 @@ export class Comic {
     }
 
     // Server part
-    update(comicVineJson) {
+    async update(comicVineJson) {
         this.count_of_issues = comicVineJson.issues
             ? comicVineJson.issues.length
             : comicVineJson.count_of_issues;
@@ -101,12 +83,16 @@ export class Comic {
         }
         this.api_detail_url = comicVineJson.api_detail_url;
         this.site_detail_url = comicVineJson.site_detail_url;
-        if (
-            this.publisher &&
-            comicVineJson.publisher &&
-            this.publisher.comicVineId !== comicVineJson.publisher.id
-        ) {
-            this.publisher = new Publisher(comicVineJson.publisher);
+        if (comicVineJson.publisher) {
+            const connection = getConnection();
+            const publisherRepository = connection.getRepository(Publisher);
+            let publisher = await publisherRepository.findOne({
+                comicVineId: comicVineJson.publisher.id
+            });
+            if (!publisher) {
+                publisher = new Publisher(comicVineJson.publisher);
+            }
+            this.publisher = publisher;
         }
         this.comicVineId = comicVineJson.id;
         this.description = comicVineJson.description;
@@ -161,7 +147,7 @@ export class Comic {
                 callback(error);
             }
             if (!error && response.statusCode == 200) {
-                var body = JSON.parse(body);
+                body = JSON.parse(body);
                 var found = false;
                 var nextPage = false;
                 if (body.number_of_total_results > page * body.limit) {
@@ -180,8 +166,8 @@ export class Comic {
                     if (
                         comicName === title &&
                         comic.start_year === this.year &&
-                        comic.publisher &&
-                        config.publishers[comic.publisher.name]
+                        comic.publisher
+                        // && config.publishers[comic.publisher.name]
                     ) {
                         console.log("Found : " + this.title);
                         found = true;

@@ -1,39 +1,26 @@
 import * as path from "path";
 import * as async from "async";
 import { Issue } from "../entity/Issue";
-import { Config } from "./Config";
 import { Comic } from "../entity/Comic";
+import { Config } from "../entity/Config";
 import { createConnection, ConnectionOptions, Connection } from "typeorm";
 import { Publisher } from "../entity/Publisher";
 import { ReadingStatus } from "../entity/ReadingStatus";
 import { Repository } from "typeorm/repository/Repository";
 
 export class ComicsLibrary {
-    private jsonfile = require("jsonfile");
-    private configFileName = "config.json";
-    config: Config;
     private connection: Connection;
+    private configRepository: Repository<Config>;
     private comicRepository: Repository<Comic>;
     private issueRepository: Repository<Issue>;
     private readingStatusRepository: Repository<ReadingStatus>;
 
-    // depracated
-    private comicsLibraryFileName = "comicsLibrary.json";
-    comics: Comic[] = [];
-    //
-
     constructor(fromJson: boolean) {
-        this.config = new Config(
-            this.jsonfile.readFileSync(this.configFileName, { throws: false })
-        );
-        if (fromJson) {
-            this.loadLibraryFromJson();
-        } else {
-            this.openConnection();
-        }
+        this.openConnection();
     }
     async openConnection() {
         this.connection = await createConnection();
+        this.configRepository = this.connection.getRepository(Config);
         this.comicRepository = this.connection.getRepository(Comic);
         this.issueRepository = this.connection.getRepository(Issue);
         this.readingStatusRepository = this.connection.getRepository(
@@ -41,25 +28,25 @@ export class ComicsLibrary {
         );
     }
 
-    // depracated
-    loadLibraryFromJson() {
-        this.comics = [];
-        const comicsLibrary = this.jsonfile.readFileSync(
-            this.comicsLibraryFileName,
-            { throws: false }
-        );
-        for (const comic in comicsLibrary) {
-            this.comics[comic] = new Comic(comicsLibrary[comic]);
+    async getConfig(res) {
+        let config = await this.configRepository.findOne();
+        if (!config) {
+            config = new Config();
         }
+        if (res) {
+            res.json(config);
+        }
+        return config;
     }
-    //
-    saveConfig(config: Config) {
-        if (config) {
-            this.config = config;
+    async saveConfig(res, reqConfig: Config) {
+        let config: Config = await this.configRepository.findOne();
+        if (!config) {
+            config = new Config();
         }
-        this.jsonfile.writeFileSync(this.configFileName, this.config, {
-            spaces: 2
-        });
+        config.comicsPath = reqConfig.comicsPath;
+        config.comicVineAPI = reqConfig.comicVineAPI;
+        await this.configRepository.save(config);
+        res.json(config);
     }
 
     private async analyseComicsFolderName(folderName: string) {
@@ -69,7 +56,7 @@ export class ComicsLibrary {
         if (comic) {
             return;
         }
-        comic = new Comic(null);
+        comic = new Comic();
         comic.folder_name = folderName;
         const folderNameSplitted = folderName.match(/(.*)\(([0-9]{4})\)$/);
         if (folderNameSplitted && folderNameSplitted.length === 3) {
@@ -82,7 +69,8 @@ export class ComicsLibrary {
     }
     async parseComics(res) {
         const fs = require("fs");
-        const libraryPath = this.config.comicsPath;
+        const config = await this.getConfig(null);
+        const libraryPath = config.comicsPath;
         const comicList = fs.readdirSync(libraryPath);
         for (const index in comicList) {
             const comicFolder = comicList[index];
@@ -139,11 +127,12 @@ export class ComicsLibrary {
         const comics = await this.comicRepository.find({
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
+        const config = await this.getConfig(null);
         for (const comicIndex in comics) {
             const comic = comics[comicIndex];
             if (!comic.finished && comic.folder_name) {
                 const comicsPath = path.resolve(
-                    this.config.comicsPath,
+                    config.comicsPath,
                     comic.folder_name
                 );
                 const readdir = require("recursive-readdir");
@@ -153,9 +142,10 @@ export class ComicsLibrary {
                         const IssuePath = issueList[index];
                         await this.analyseIssuePath(comic, IssuePath);
                     }
-                }
-                catch (e) {
-                    console.log("Unable to parse comic : " + comic.folder_name + " " + e)
+                } catch (e) {
+                    console.log(
+                        "Unable to parse comic : " + comic.folder_name + " " + e
+                    );
                 }
             }
         }
@@ -171,7 +161,7 @@ export class ComicsLibrary {
     }
 
     async createComic(res, comicTitle: string, comicYear: string) {
-        let comic = new Comic(null);
+        const comic = new Comic();
         comic.title = comicTitle;
         comic.year = comicYear;
         comic.folder_name = comicTitle + " (" + comicYear + ")";
@@ -181,7 +171,8 @@ export class ComicsLibrary {
             await that.comicRepository.save(comic);
             that.getComics(res);
         }
-        await comic.findExactMapping(this.config, callback);
+        const config = await this.getConfig(null);
+        await comic.findExactMapping(config, callback);
     }
 
     async getComic(res, comicId: number) {
@@ -195,7 +186,7 @@ export class ComicsLibrary {
         const comics = await this.comicRepository.find({
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
-        let config = this.config;
+        const config = await this.getConfig(null);
         for (let comicId in comics) {
             let comic = comics[comicId];
             if (!comic.comicVineId) {
@@ -213,11 +204,11 @@ export class ComicsLibrary {
         let comics = await this.comicRepository.find({
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
-        let config = this.config;
+        const config = await this.getConfig(null);
         for (let comicId in comics) {
-            let comic = comics[comicId];
+            const comic = comics[comicId];
             if (!comic.finished) {
-                let that = this;
+                const that = this;
                 async function callback(error) {
                     await that.comicRepository.save(comic);
                 }
@@ -230,35 +221,37 @@ export class ComicsLibrary {
     }
 
     async updateComicInfos(res, comicId: number) {
-        let comic: Comic = await this.comicRepository.findOneById(comicId, {
+        const comic: Comic = await this.comicRepository.findOneById(comicId, {
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
-        let that = this;
+        const config = await this.getConfig(null);
+        const that = this;
         async function callback(error) {
             await that.comicRepository.save(comic);
             res.json(comic);
         }
-        comic.updateInfos(this.config, callback);
+        comic.updateInfos(config, callback);
     }
 
     async updateComicVineId(res, comicId: number, comicVineId: number) {
-        let comic: Comic = await this.comicRepository.findOneById(comicId, {
+        const comic: Comic = await this.comicRepository.findOneById(comicId, {
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
-        let that = this;
+        const config = await this.getConfig(null);
+        const that = this;
         async function callback(error) {
             await that.comicRepository.save(comic);
             res.json(comic);
         }
         if (comic && comicVineId && comic.comicVineId !== comicVineId) {
             comic.comicVineId = comicVineId;
-            comic.updateInfos(this.config, callback);
+            comic.updateInfos(config, callback);
         } else {
             res.json(comic);
         }
     }
     async toggleComicFinished(res, comicId: number) {
-        let comic: Comic = await this.comicRepository.findOneById(comicId);
+        const comic: Comic = await this.comicRepository.findOneById(comicId);
         await this.comicRepository.updateById(comicId, {
             finished: !comic.finished
         });
@@ -279,11 +272,14 @@ export class ComicsLibrary {
         let comic: Comic = await this.comicRepository.findOneById(comicId, {
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
-        for (let index in comic.issues) {
-            let comicIssue = comic.issues[index];
+        for (const index in comic.issues) {
+            const comicIssue = comic.issues[index];
             if (issue.number === comicIssue.number) {
                 if (comicIssue.file_name) {
-                    res.json({ status: "fail", message: "this issue number already exists" });
+                    res.json({
+                        status: "fail",
+                        message: "this issue number already exists"
+                    });
                     return;
                 }
                 comicIssue.file_name = issue.file_name;
@@ -291,7 +287,10 @@ export class ComicsLibrary {
                 comicIssue.possessed = true;
                 this.issueRepository.save(comicIssue);
                 this.issueRepository.deleteById(issueId);
-                res.json({ status: "success", message: "replaced missing issue" });
+                res.json({
+                    status: "success",
+                    message: "replaced missing issue"
+                });
                 return;
             }
         }
@@ -305,13 +304,15 @@ export class ComicsLibrary {
     }
 
     async read(res, issueId: number) {
-        let issue: Issue = await this.issueRepository.findOneById(issueId);
+        const config = await this.getConfig(null);
+        const issue: Issue = await this.issueRepository.findOneById(issueId);
         if (issue) {
-            issue.readFile(this.config, res);
+            issue.readFile(config, res);
         }
     }
 
-    updateReadingStatus(readingStatus: ReadingStatus) {
-        this.readingStatusRepository.save(readingStatus);
+    async updateReadingStatus(res, readingStatus: ReadingStatus) {
+        await this.readingStatusRepository.save(readingStatus);
+        res.json({ status: "success", message: "reading status updated" });
     }
 }

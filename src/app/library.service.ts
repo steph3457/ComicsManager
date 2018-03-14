@@ -22,7 +22,7 @@ export class LibraryService {
         this.http.get("/api/comics").subscribe(res => {
             this.comics = res.json();
         });
-        this.http.get("/getConfig").subscribe(res => {
+        this.http.get("/api/config").subscribe(res => {
             var config = res.json();
             this.config = new Config(config);
         });
@@ -50,7 +50,7 @@ export class LibraryService {
     }
     saveConfig(notificationsService: NotificationsService) {
         let notif = notificationsService.info("Save config", "pending...");
-        this.http.post("/saveConfig", this.config).subscribe(res => {
+        this.http.post("/api/config", this.config).subscribe(res => {
             notificationsService.remove(notif.id);
             notificationsService.success("Save config", "complete", {
                 timeOut: 2000
@@ -116,14 +116,16 @@ export class LibraryService {
     sortBy(column: string) {
         switch (column) {
             case "title": {
-                if (this.comicsComparer === Comic.ComicTitleComparer)
+                if (this.comicsComparer === Comic.ComicTitleComparer) {
                     this.comicsReverse = !this.comicsReverse;
+                }
                 this.comicsComparer = Comic.ComicTitleComparer;
                 break;
             }
             case "year": {
-                if (this.comicsComparer === Comic.ComicYearComparer)
+                if (this.comicsComparer === Comic.ComicYearComparer) {
                     this.comicsReverse = !this.comicsReverse;
+                }
                 this.comicsComparer = Comic.ComicYearComparer;
                 break;
             }

@@ -3,8 +3,7 @@ import { Comic } from "./Comic";
 
 @Entity()
 export class Publisher {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryGeneratedColumn() id: number;
     @Column({ default: "" })
     api_detail_url: string;
     @Column({ default: 0, unique: true })
@@ -25,5 +24,4 @@ export class Publisher {
             this.name = publisher.name;
         }
     }
-
 }
