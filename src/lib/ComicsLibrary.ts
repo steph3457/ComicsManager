@@ -154,7 +154,8 @@ export class ComicsLibrary {
 
     async getComics(res) {
         const comics = await this.comicRepository.find({
-            relations: ["issues", "issues.readingStatus", "publisher"]
+            relations: ["issues", "issues.readingStatus", "publisher"],
+            order: { title: "ASC", year: "ASC" }
         });
         comics.forEach((comic: Comic) => comic.updateCount());
         res.json(comics);
