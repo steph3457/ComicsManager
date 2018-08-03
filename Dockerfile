@@ -20,4 +20,6 @@ COPY . .
 
 RUN yarn build
 
+RUN mkdir temp
+
 CMD [ "node", "dist/server.js" ]
