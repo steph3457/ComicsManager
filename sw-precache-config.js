@@ -10,24 +10,24 @@ module.exports = {
     ],
     runtimeCaching: [
         {
-            urlPattern: "/getConfig",
+            urlPattern: "/api/comics",
             handler: "networkFirst"
         },
         {
-            urlPattern: "/getLibrary",
+            urlPattern: "/api/comic/(.*)",
             handler: "networkFirst"
         },
         {
-            urlPattern: /.*\/read\/.*/,
-            handler: "cacheFirst"
+            urlPattern: "/api/read/(.*)",
+            handler: "networkFirst"
+        },
+        {
+            urlPattern: "/api/image/(.*)",
+            handler: "fastest"
         },
         {
             urlPattern: /https:\/\/comicvine.gamespot.com\/.*/,
-            handler: "cacheFirst"
-        },
-        {
-            urlPattern: /.*\/image\/.*/,
-            handler: "cacheFirst"
+            handler: "fastest"
         }
     ]
 };
