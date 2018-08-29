@@ -87,6 +87,11 @@ export class ComicDetailsComponent implements OnInit {
     let notif = this.notificationsService.info("Delete issue", "pending...");
     this.http.delete('/api/issue/' + issueId).subscribe(res => {
       this.notificationsService.remove(notif.id);
+      for (let issueIndex in this.comic.issues) {
+        if (this.comic.issues[issueIndex].id === issueId) {
+          delete this.comic.issues[issueIndex];
+        }
+      }
       this.notificationsService.success("Delete issue", "complete", { timeOut: 1000 });
     });
   }
