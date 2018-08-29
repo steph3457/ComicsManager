@@ -116,6 +116,13 @@ export class ComicsLibrary {
                 issue.title = issueNameSplitted[1].replace(/_/g, " ");
                 issue.number = parseFloat(issueNameSplitted[2]);
             }
+            else {
+                issueNameSplitted = issue.file_name.match(/(.*?)([0-9.]{2,}).*/);
+                if (issueNameSplitted && issueNameSplitted.length === 3) {
+                    issue.title = issueNameSplitted[1].replace(/_/g, " ");
+                    issue.number = parseFloat(issueNameSplitted[2]);
+                }
+            }
         }
         if (issue.file_name.indexOf("Annual") > 0) {
             issue.annual = true;
