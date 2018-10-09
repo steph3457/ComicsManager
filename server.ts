@@ -10,6 +10,8 @@ import * as fs from "fs";
 
 const app = express();
 const comicsLibrary = new ComicsLibrary(false);
+var cors = require('cors')
+app.use(cors())
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
