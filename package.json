@@ -26,6 +26,7 @@
         "bootstrap": "^3.3.7",
         "cookie-parser": "^1.4.3",
         "core-js": "^2.5.3",
+        "cors": "^2.8.4",
         "cross-unzip": "^0.2.1",
         "express": "^4.16.2",
         "jsonfile": "^4.0.0",
