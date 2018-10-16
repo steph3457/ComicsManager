@@ -82,6 +82,13 @@ app.post("/api/issue/:issue/updateComic", function(req, res) {
         parseInt(req.body.comicId, 10)
     );
 });
+app.post("/api/issue/:issue/updateNumber", function(req, res) {
+    comicsLibrary.updateIssueNumber(
+        res,
+        +req.params.issue,
+        parseInt(req.body.issueNumber, 10)
+    );
+});
 app.delete("/api/issue/:issue", function(req, res) {
     comicsLibrary.deleteIssue(res, +req.params.issue);
 });

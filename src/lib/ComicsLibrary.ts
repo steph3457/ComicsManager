@@ -307,6 +307,20 @@ export class ComicsLibrary {
         this.issueRepository.updateById(issueId, { comic: comic });
         res.json({ status: "success", message: "issue added in the comic" });
     }
+    async updateIssueNumber(res, issueId: number, issueNumber: number) {
+        const issue: Issue = await this.issueRepository.findOneById(issueId);
+        if (issue.number === issueNumber) {
+            res.json({ status: "fail", message: "no change found" });
+            return;
+        }
+        if (!issue.possessed) {
+            res.json({ status: "fail", message: "don't have the issue" });
+            return;
+        }
+        this.issueRepository.updateById(issueId, { number: issueNumber });
+        res.json({ status: "success", message: "issue number updated" });
+
+    }
 
     async deleteIssue(res, issueId: number) {
         await this.issueRepository.deleteById(issueId);
