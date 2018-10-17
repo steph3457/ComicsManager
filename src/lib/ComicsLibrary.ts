@@ -260,10 +260,10 @@ export class ComicsLibrary {
             res.json(comic);
         }
     }
-    async toggleComicFinished(res, comicId: number) {
+    async updateComicFinished(res, comicId: number, finished: boolean) {
         const comic: Comic = await this.comicRepository.findOneById(comicId);
         await this.comicRepository.updateById(comicId, {
-            finished: !comic.finished
+            finished: finished
         });
         res.json(comic);
     }

@@ -62,8 +62,8 @@ app.get("/api/comic/:comic", function(req, res) {
 app.get("/api/comic/:comic/updateInfos", function(req, res) {
     comicsLibrary.updateComicInfos(res, +req.params.comic);
 });
-app.get("/api/comic/:comic/toggleFinished", function(req, res) {
-    comicsLibrary.toggleComicFinished(res, +req.params.comic);
+app.post("/api/comic/:comic/updateFinished", function(req, res) {
+    comicsLibrary.updateComicFinished(res, +req.params.comic, !!req.body.finished);
 });
 app.post("/api/comic/:comic/updateComicVineId", function(req, res) {
     comicsLibrary.updateComicVineId(
