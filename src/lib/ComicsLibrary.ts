@@ -264,9 +264,12 @@ export class ComicsLibrary {
         const comic: Comic = await this.comicRepository.findOneById(comicId, {
             relations: ["issues", "issues.readingStatus", "publisher"]
         });
-        await this.comicRepository.updateById(comicId, {
-            finished: finished
-        });
+        if (comic.finished != finished) {
+            comic.finished = finished;
+            await this.comicRepository.updateById(comicId, {
+                finished: finished
+            });
+        }
         res.json(comic);
     }
     async updateIssueComicId(res, issueId: number, comicId: number) {
