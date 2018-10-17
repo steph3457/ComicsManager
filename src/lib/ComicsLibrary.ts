@@ -261,7 +261,9 @@ export class ComicsLibrary {
         }
     }
     async updateComicFinished(res, comicId: number, finished: boolean) {
-        const comic: Comic = await this.comicRepository.findOneById(comicId);
+        const comic: Comic = await this.comicRepository.findOneById(comicId, {
+            relations: ["issues", "issues.readingStatus", "publisher"]
+        });
         await this.comicRepository.updateById(comicId, {
             finished: finished
         });
