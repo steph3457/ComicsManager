@@ -23,7 +23,7 @@
         "angular2-notifications": "^0.9.7",
         "async": "^2.6.0",
         "body-parser": "^1.18.2",
-        "bootstrap": "^3.3.7",
+        "bootstrap": "^3.4.1",
         "cookie-parser": "^1.4.3",
         "core-js": "^2.5.3",
         "cross-unzip": "^0.2.1",
